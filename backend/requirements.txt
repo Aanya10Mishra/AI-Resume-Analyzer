@@ -1,0 +1,20 @@
+flask==3.0.3
+flask-cors==4.0.1
+flask-sqlalchemy==3.1.1        # unchanged (latest 3.1.x)
+python-dotenv==1.0.1
+werkzeug==3.0.3
+
+PyPDF2==3.0.1                  # unchanged (latest 3.0.x)
+python-docx==1.1.2
+spacy==3.7.5
+
+sentence-transformers==3.0.1
+torch==2.3.1                   # CPU wheel; use +cu121/+cu124 for CUDA
+transformers==4.42.4
+
+scikit-learn==1.5.1
+numpy==1.26.4
+pandas==2.2.2
+
+groq
+requests

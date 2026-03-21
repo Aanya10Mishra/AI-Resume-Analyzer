@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analyzer - AI Powered Resume Analysis</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#667eea',
+                            600: '#5a67d8',
+                            700: '#4c51bf',
+                            800: '#434190',
+                            900: '#3c366b',
+                        },
+                        secondary: {
+                            500: '#764ba2',
+                            600: '#6a4190',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s ease-in-out infinite',
+                        'bounce-slow': 'bounce 3s ease-in-out infinite',
+                        'gradient': 'gradient 15s ease infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        gradient: {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #5a67d8);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px -12px rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+        }
+        
+        .score-ring {
+            background: conic-gradient(#10b981 var(--score), #e5e7eb var(--score));
+        }
+        
+        /* Hide sections initially */
+        .page-section {
+            display: none;
+        }
+        
+        .page-section.active {
+            display: block;
+        }
+        
+        /* CRITICAL FIX: Force results containers to be visible on all screen sizes */
+        #analysis-results,
+        #ai-results {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            min-height: 200px;
+            overflow: visible !important;
+        }
+        
+        /* Fix grid layout for large screens */
+        @media (min-width: 1024px) {
+            .results-container {
+                grid-column: span 2 / span 2 !important;
+                display: block !important;
+            }
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+        }
+        
+        /* Loader */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* File drop zone */
+        .drop-zone.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Toast notifications */
+        .toast {
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-3"></div>
+    
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-40 transition-all duration-300 bg-white/80 backdrop-blur-lg shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <a href="#" onclick="showSection('landing')" class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
+                        <i class="fas fa-file-alt text-white text-lg"></i>
+                    </div>
+                    <span class="text-xl font-bold text-gradient">Resume Analyzer</span>
+                </a>
+                
+                <!-- Nav Links -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="#features" class="text-gray-600 hover:text-primary-500 font-medium transition-colors">Features</a>
+                    <a href="#how-it-works" class="text-gray-600 hover:text-primary-500 font-medium transition-colors">How it Works</a>
+                    
+                    <!-- Auth Buttons (shown when logged out) -->
+                    <div id="auth-buttons" class="flex items-center space-x-3">
+                        <button onclick="showSection('login')" class="text-gray-600 hover:text-primary-500 font-medium transition-colors">Login</button>
+                        <button onclick="showSection('register')" class="btn-primary text-white px-6 py-2 rounded-full font-semibold">Get Started</button>
+                    </div>
+                    
+                    <!-- User Menu (shown when logged in) -->
+                    <div id="user-menu" class="hidden flex items-center space-x-4">
+                        <button onclick="showSection('dashboard')" class="text-gray-600 hover:text-primary-500 font-medium transition-colors">
+                            <i class="fas fa-th-large mr-2"></i>Dashboard
+                        </button>
+                        <div class="flex items-center space-x-3 bg-primary-50 px-4 py-2 rounded-full">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
+                                <i class="fas fa-user text-white text-sm"></i>
+                            </div>
+                            <span id="user-name" class="font-semibold text-gray-700">User</span>
+                            <span id="user-role" class="text-xs bg-primary-500 text-white px-2 py-1 rounded-full capitalize">Role</span>
+                        </div>
+                        <button onclick="logout()" class="text-red-500 hover:text-red-600 font-medium transition-colors">
+                            <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden text-gray-600" aria-label="Open mobile navigation menu">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==================== LANDING PAGE ==================== -->
+    <section id="landing" class="page-section active">
+        
+        <!-- API Status -->
+        <div id="api-status" class="fixed top-16 left-0 right-0 z-30 text-center py-2 text-sm font-medium transition-all duration-300">
+            <span id="status-text">🔄 Checking backend connection...</span>
+        </div>
+        
+        <!-- Hero Section -->
+        <div class="gradient-bg min-h-screen flex items-center pt-24 pb-16 relative overflow-hidden">
+            <!-- Background Decorations -->
+            <div class="absolute top-20 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-20 right-10 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <!-- Left Content -->
+                    <div class="text-white" data-aos="fade-right">
+                        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
+                            AI-Powered<br>
+                            <span class="text-yellow-300">Resume Analyzer</span>
+                        </h1>
+                        <p class="text-lg md:text-xl text-white/90 mb-8 leading-relaxed">
+                            Get your resume analyzed by advanced AI, improve your ATS score, 
+                            and land your dream job faster. Powered by Sentence Transformers & Groq AI.
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <button onclick="showSection('register')" class="bg-white text-primary-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-all hover:scale-105 shadow-xl">
+                                <i class="fas fa-rocket mr-2"></i>Get Started Free
+                            </button>
+                            <button onclick="showSection('login')" class="glass text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/20 transition-all">
+                                <i class="fas fa-sign-in-alt mr-2"></i>Login
+                            </button>
+                        </div>
+                        
+                        <!-- Stats -->
+                        <div class="flex flex-wrap gap-8 mt-12">
+                            <div class="text-center">
+                                <div class="text-3xl font-bold">98%</div>
+                                <div class="text-white/70 text-sm">Accuracy</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold">10K+</div>
+                                <div class="text-white/70 text-sm">Resumes Analyzed</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold">5s</div>
+                                <div class="text-white/70 text-sm">Analysis Time</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Content - Illustration -->
+                    <div class="relative" data-aos="fade-left">
+                        <div class="relative">
+                            <!-- Main Card -->
+                            <div class="bg-white rounded-3xl shadow-2xl p-8 transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                                <div class="flex items-center justify-between mb-6">
+                                    <h3 class="text-xl font-bold text-gray-800">ATS Score</h3>
+                                    <span class="text-green-500 font-bold"><i class="fas fa-arrow-up mr-1"></i>+15%</span>
+                                </div>
+                                
+                                <!-- Score Circle -->
+                                <div class="flex justify-center mb-6">
+                                    <div class="relative w-40 h-40">
+                                        <svg class="w-full h-full transform -rotate-90">
+                                            <circle cx="80" cy="80" r="70" stroke="#e5e7eb" stroke-width="12" fill="none"/>
+                                            <circle cx="80" cy="80" r="70" stroke="url(#gradient)" stroke-width="12" fill="none" 
+                                                    stroke-dasharray="440" stroke-dashoffset="66" stroke-linecap="round"/>
+                                            <defs>
+                                                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                    <stop offset="0%" stop-color="#10b981"/>
+                                                    <stop offset="100%" stop-color="#059669"/>
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                            <span class="text-4xl font-extrabold text-gray-800">85</span>
+                                            <span class="text-gray-500 text-sm">out of 100</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Skills -->
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-600">Skills Match</span>
+                                        <span class="font-bold text-primary-500">92%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-gradient-to-r from-primary-500 to-secondary-500 h-2 rounded-full" style="width: 92%"></div>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center mt-4">
+                                        <span class="text-gray-600">Keywords</span>
+                                        <span class="font-bold text-green-500">88%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full" style="width: 88%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Floating Elements -->
+                            <div class="absolute -top-6 -right-6 bg-green-500 text-white px-4 py-2 rounded-xl shadow-lg animate-bounce-slow">
+                                <i class="fas fa-check-circle mr-2"></i>ATS Optimized
+                            </div>
+                            <div class="absolute -bottom-4 -left-4 bg-yellow-400 text-gray-800 px-4 py-2 rounded-xl shadow-lg animate-float">
+                                <i class="fas fa-star mr-2"></i>AI Powered
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Wave Bottom -->
+            <div class="absolute bottom-0 left-0 right-0">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" fill="#f9fafb">
+                    <path d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"></path>
+                </svg>
+            </div>
+        </div>
+        
+        
+                <!-- Features Section -->
+        <div id="features" class="py-24 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16" data-aos="fade-up">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                        Why Choose <span class="text-gradient">Resume Analyzer?</span>
+                    </h2>
+                    <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+                        Powerful features to help you create the perfect resume and land your dream job.
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Feature 1 - ATS Score -->
+                    <div class="bg-white rounded-2xl p-8 shadow-lg card-hover" data-aos="fade-up" data-aos-delay="100">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center mb-6">
+                            <i class="fas fa-chart-line text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">ATS Score</h3>
+                        <p class="text-gray-600">Get your Applicant Tracking System compatibility score. Optimize your resume to pass automated screening systems used by 90% of companies.</p>
+                        <div class="mt-4 flex items-center text-green-500 font-semibold">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            <span>Real-time scoring</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Feature 2 - Match Score -->
+                    <div class="bg-white rounded-2xl p-8 shadow-lg card-hover" data-aos="fade-up" data-aos-delay="200">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center mb-6">
+                            <i class="fas fa-bullseye text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Match Score</h3>
+                        <p class="text-gray-600">Compare your resume against specific job descriptions. See exactly how well your skills and experience align with the role requirements.</p>
+                        <div class="mt-4 flex items-center text-primary-500 font-semibold">
+                            <i class="fas fa-percentage mr-2"></i>
+                            <span>Percentage match</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Feature 3 - Career Recommendation -->
+                    <div class="bg-white rounded-2xl p-8 shadow-lg card-hover" data-aos="fade-up" data-aos-delay="300">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center mb-6">
+                            <i class="fas fa-route text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Career Recommendation</h3>
+                        <p class="text-gray-600">AI-powered career path suggestions based on your skills and experience. Discover new opportunities aligned with your professional profile.</p>
+                        <div class="mt-4 flex items-center text-purple-500 font-semibold">
+                            <i class="fas fa-road mr-2"></i>
+                            <span>Personalized paths</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Feature 4 - Skill Gap Analysis -->
+                    <div class="bg-white rounded-2xl p-8 shadow-lg card-hover" data-aos="fade-up" data-aos-delay="400">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center mb-6">
+                            <i class="fas fa-puzzle-piece text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Skill Gap Analysis</h3>
+                        <p class="text-gray-600">Identify missing skills compared to your target job. Get actionable recommendations to bridge the gap and boost your employability.</p>
+                        <div class="mt-4 flex items-center text-orange-500 font-semibold">
+                            <i class="fas fa-tasks mr-2"></i>
+                            <span>Actionable insights</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Features Row -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mt-8">
+                    <!-- Feature 5 - AI Suggestions -->
+                    <div class="bg-white rounded-2xl p-8 shadow-lg card-hover" data-aos="fade-up" data-aos-delay="500">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mb-6">
+                            <i class="fas fa-robot text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">AI Suggestions</h3>
+                        <p class="text-gray-600">Get intelligent, personalized recommendations powered by Groq AI and Llama models to enhance your resume content.</p>
+                    </div>
+                    
+                    <!-- Feature 6 - Interview Prep -->
+                    <div class="bg-white rounded-2xl p-8 shadow-lg card-hover" data-aos="fade-up" data-aos-delay="600">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center mb-6">
+                            <i class="fas fa-comments text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Interview Prep</h3>
+                        <p class="text-gray-600">Generate tailored interview questions based on your resume and target job. Practice with AI-generated Q&A scenarios.</p>
+                    </div>
+                    
+                    <!-- Feature 7 - Instant Analysis -->
+                    <div class="bg-white rounded-2xl p-8 shadow-lg card-hover" data-aos="fade-up" data-aos-delay="700">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center mb-6">
+                            <i class="fas fa-bolt text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Instant Analysis</h3>
+                        <p class="text-gray-600">Upload your resume and get comprehensive feedback in seconds with our AI-powered analysis engine.</p>
+                    </div>
+                    
+                    <!-- Feature 8 - Role Based -->
+                    <div class="bg-white rounded-2xl p-8 shadow-lg card-hover" data-aos="fade-up" data-aos-delay="800">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center mb-6">
+                            <i class="fas fa-users text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Role-Based Access</h3>
+                        <p class="text-gray-600">Custom dashboards for Students, Employees, and HR Recruiters with tailored features for each user type.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div id="how-it-works" class="py-24 bg-gradient-to-br from-gray-900 to-gray-800 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10">
+                <div class="absolute top-0 left-0 w-full h-full" style="background-image: url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.4&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+            </div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="text-center mb-16" data-aos="fade-up">
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                        How It <span class="text-yellow-400">Works</span>
+                    </h2>
+                    <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+                        Get your resume analyzed in four simple steps
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-4 gap-8">
+                    <!-- Step 1 -->
+                    <div class="text-center" data-aos="fade-up" data-aos-delay="100">
+                        <div class="relative inline-block mb-6">
+                            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                                1
+                            </div>
+                            <div class="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
+                                <i class="fas fa-upload text-gray-800 text-sm"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Upload Resume</h3>
+                        <p class="text-gray-400">Upload your PDF or DOCX resume file</p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+                        <div class="relative inline-block mb-6">
+                            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                                2
+                            </div>
+                            <div class="absolute -top-2 -right-2 w-8 h-8 bg-green-400 rounded-full flex items-center justify-center">
+                                <i class="fas fa-cog text-gray-800 text-sm"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">AI Analysis</h3>
+                        <p class="text-gray-400">Our AI analyzes your resume instantly</p>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="text-center" data-aos="fade-up" data-aos-delay="300">
+                        <div class="relative inline-block mb-6">
+                            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                                3
+                            </div>
+                            <div class="absolute -top-2 -right-2 w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center">
+                                <i class="fas fa-lightbulb text-gray-800 text-sm"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Get Suggestions</h3>
+                        <p class="text-gray-400">Receive AI-powered improvement tips</p>
+                    </div>
+                    
+                    <!-- Step 4 -->
+                    <div class="text-center" data-aos="fade-up" data-aos-delay="400">
+                        <div class="relative inline-block mb-6">
+                            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                                4
+                            </div>
+                            <div class="absolute -top-2 -right-2 w-8 h-8 bg-pink-400 rounded-full flex items-center justify-center">
+                                <i class="fas fa-trophy text-gray-800 text-sm"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Land Your Job</h3>
+                        <p class="text-gray-400">Apply with confidence and succeed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CTA Section -->
+        <div class="py-24 gradient-bg relative overflow-hidden">
+            <div class="absolute inset-0">
+                <div class="absolute top-10 left-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+                <div class="absolute bottom-10 right-10 w-60 h-60 bg-white/10 rounded-full blur-2xl"></div>
+            </div>
+            
+            <div class="max-w-4xl mx-auto px-4 text-center relative z-10" data-aos="zoom-in">
+                <h2 class="text-3xl md:text-5xl font-bold text-white mb-6">
+                    Ready to Improve Your Resume?
+                </h2>
+                <p class="text-xl text-white/90 mb-10">
+                    Join thousands of job seekers who have improved their resumes with our AI-powered platform.
+                </p>
+                <button onclick="showSection('register')" class="bg-white text-primary-600 px-10 py-5 rounded-full font-bold text-xl hover:bg-gray-100 transition-all hover:scale-105 shadow-2xl">
+                    <i class="fas fa-rocket mr-3"></i>Start Free Analysis
+                </button>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="bg-gray-900 text-white py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="flex items-center space-x-3 mb-6 md:mb-0">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
+                            <i class="fas fa-file-alt text-white text-lg"></i>
+                        </div>
+                        <span class="text-xl font-bold">Resume Analyzer</span>
+                    </div>
+                    <div class="text-center md:text-right">
+                        <p class="text-gray-400">© 2026 Resume Analyzer. Built with ❤️ using Flask & AI</p>
+                        <p class="text-gray-500 text-sm mt-2">Powered by Sentence Transformers, Groq AI & O*NET</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </section>
+    
+    <!-- ==================== LOGIN PAGE ==================== -->
+    <section id="login" class="page-section">
+        <div class="min-h-screen gradient-bg flex items-center justify-center py-12 px-4 relative overflow-hidden">
+            <div class="absolute inset-0">
+                <div class="absolute top-20 left-20 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
+                <div class="absolute bottom-20 right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+            </div>
+            
+            <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-10 relative z-10" data-aos="fade-up">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-sign-in-alt text-white text-2xl"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gradient">Welcome Back</h2>
+                    <p class="text-gray-500 mt-2">Login to access your dashboard</p>
+                </div>
+                
+                <form id="login-form" class="space-y-6">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-envelope mr-2 text-primary-500"></i>Email
+                        </label>
+                        <input type="email" id="login-email" required
+                               class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none transition-colors"
+                               placeholder="Enter your email">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-lock mr-2 text-primary-500"></i>Password
+                        </label>
+                        <input type="password" id="login-password" required
+                               class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none transition-colors"
+                               placeholder="Enter your password">
+                    </div>
+                    
+                    <button type="submit" class="w-full btn-primary text-white py-4 rounded-xl font-bold text-lg">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </button>
+                </form>
+                
+                <div class="text-center mt-8 pt-6 border-t border-gray-200">
+                    <p class="text-gray-600">
+                        Don't have an account? 
+                        <button onclick="showSection('register')" class="text-primary-500 font-bold hover:underline">Register here</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- ==================== REGISTER PAGE ==================== -->
+    <section id="register" class="page-section">
+        <div class="min-h-screen gradient-bg flex items-center justify-center py-12 px-4 relative overflow-hidden">
+            <div class="absolute inset-0">
+                <div class="absolute top-20 left-20 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
+                <div class="absolute bottom-20 right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+            </div>
+            
+            <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-10 relative z-10" data-aos="fade-up">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user-plus text-white text-2xl"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gradient">Create Account</h2>
+                    <p class="text-gray-500 mt-2">Join us and start improving your resume</p>
+                </div>
+                
+                <form id="register-form" class="space-y-5">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-user mr-2 text-primary-500"></i>Full Name
+                        </label>
+                        <input type="text" id="reg-name" required
+                               class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none transition-colors"
+                               placeholder="Enter your full name">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-envelope mr-2 text-primary-500"></i>Email
+                        </label>
+                        <input type="email" id="reg-email" required
+                               class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none transition-colors"
+                               placeholder="Enter your email">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-user-tag mr-2 text-primary-500"></i>I am a...
+                        </label>
+                        <select id="reg-role" required
+                                class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none transition-colors bg-white">
+                            <option value="student">🎓 Student</option>
+                            <option value="employee">💼 Employee</option>
+                            <option value="hr">👔 HR / Recruiter</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-lock mr-2 text-primary-500"></i>Password
+                        </label>
+                        <input type="password" id="reg-password" required minlength="6"
+                               class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none transition-colors"
+                               placeholder="Create a password (min 6 characters)">
+                    </div>
+                    
+                    <button type="submit" class="w-full btn-primary text-white py-4 rounded-xl font-bold text-lg">
+                        <i class="fas fa-user-plus mr-2"></i>Create Account
+                    </button>
+                </form>
+                
+                <div class="text-center mt-8 pt-6 border-t border-gray-200">
+                    <p class="text-gray-600">
+                        Already have an account? 
+                        <button onclick="showSection('login')" class="text-primary-500 font-bold hover:underline">Login here</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- ==================== DASHBOARD ==================== -->
+    <section id="dashboard" class="page-section">
+        <div class="min-h-screen bg-gray-50 pt-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                
+                <!-- Dashboard Header -->
+                <div class="flex flex-wrap items-center justify-between mb-8" data-aos="fade-down">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800">
+                            Welcome, <span id="dashboard-user-name" class="text-gradient">User</span>! 👋
+                        </h1>
+                        <p class="text-gray-500 mt-1">Manage your resumes and job applications</p>
+                    </div>
+                    <div id="dashboard-role-badge" class="mt-4 md:mt-0 px-6 py-2 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 text-white font-bold capitalize">
+                        Role
+                    </div>
+                </div>
+                
+                <!-- Dashboard Tabs -->
+                <div class="bg-white rounded-2xl shadow-lg p-2 mb-8 flex flex-wrap gap-2" data-aos="fade-up">
+                    <button onclick="showDashboardTab('resumes')" id="tab-resumes" class="dashboard-tab active flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all">
+                        <i class="fas fa-file-alt"></i>Resumes
+                    </button>
+                    <button onclick="showDashboardTab('jobs')" id="tab-jobs" class="dashboard-tab flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all">
+                        <i class="fas fa-briefcase"></i>Job Descriptions
+                    </button>
+                    <button onclick="showDashboardTab('analysis')" id="tab-analysis" class="dashboard-tab flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all">
+                        <i class="fas fa-chart-bar"></i>Analysis
+                    </button>
+                    <button onclick="showDashboardTab('ai')" id="tab-ai" class="dashboard-tab flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all">
+                        <i class="fas fa-robot"></i>AI Features
+                    </button>
+                </div>
+                
+                <!-- ===== RESUMES TAB ===== -->
+                <div id="content-resumes" class="dashboard-content">
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <!-- Upload Section -->
+                        <div class="bg-white rounded-2xl shadow-lg p-8" data-aos="fade-right">
+                            <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
+                                    <i class="fas fa-upload text-primary-500"></i>
+                                </div>
+                                Upload Resume
+                            </h2>
+                            
+                            <div id="drop-zone" class="drop-zone border-3 border-dashed border-gray-300 rounded-2xl p-10 text-center cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-all">
+                                <input type="file" id="resume-file" accept=".pdf,.docx" class="hidden">
+                                <div class="text-6xl text-primary-300 mb-4">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <p class="text-gray-600 font-medium">Drag & drop your resume here</p>
+                                <p class="text-gray-400 text-sm mt-2">or click to browse (PDF, DOCX)</p>
+                            </div>
+                            
+                            <button onclick="uploadResume()" id="upload-btn" class="w-full btn-primary text-white py-4 rounded-xl font-bold mt-6 disabled:opacity-50" disabled>
+                                <i class="fas fa-upload mr-2"></i>Upload Resume
+                            </button>
+                        </div>
+                        
+                        <!-- Resumes List -->
+                        <div class="bg-white rounded-2xl shadow-lg p-8" data-aos="fade-left">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
+                                        <i class="fas fa-folder-open text-green-500"></i>
+                                    </div>
+                                    My Resumes
+                                </h2>
+                                <button onclick="loadResumes()" class="text-primary-500 hover:text-primary-600 font-medium">
+                                    <i class="fas fa-sync-alt mr-1"></i>Refresh
+                                </button>
+                            </div>
+                            
+                            <div id="resumes-list" class="space-y-4 max-h-96 overflow-y-auto">
+                                <div class="text-center py-10 text-gray-400">
+                                    <i class="fas fa-inbox text-4xl mb-3"></i>
+                                    <p>No resumes yet. Upload one!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ===== JOBS TAB ===== -->
+                <div id="content-jobs" class="dashboard-content hidden">
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <!-- Create JD -->
+                        <div class="bg-white rounded-2xl shadow-lg p-8" data-aos="fade-right">
+                            <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                                    <i class="fas fa-plus text-blue-500"></i>
+                                </div>
+                                Create Job Description
+                            </h2>
+                            
+                            <form id="jd-form" class="space-y-5">
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Job Title</label>
+                                    <input type="text" id="jd-title" required
+                                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none"
+                                           placeholder="e.g., Senior Software Engineer">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Company</label>
+                                    <input type="text" id="jd-company"
+                                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none"
+                                           placeholder="e.g., Tech Corp">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Description</label>
+                                    <textarea id="jd-description" required rows="5"
+                                              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none resize-none"
+                                              placeholder="Paste the job description here..."></textarea>
+                                </div>
+                                <button type="submit" class="w-full btn-primary text-white py-4 rounded-xl font-bold">
+                                    <i class="fas fa-plus mr-2"></i>Create Job Description
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- JD List -->
+                        <div class="bg-white rounded-2xl shadow-lg p-8" data-aos="fade-left">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+                                        <i class="fas fa-list text-purple-500"></i>
+                                    </div>
+                                    My Job Descriptions
+                                </h2>
+                                <button onclick="loadJDs()" class="text-primary-500 hover:text-primary-600 font-medium">
+                                    <i class="fas fa-sync-alt mr-1"></i>Refresh
+                                </button>
+                            </div>
+                            
+                            <div id="jds-list" class="space-y-4 max-h-96 overflow-y-auto">
+                                <div class="text-center py-10 text-gray-400">
+                                    <i class="fas fa-inbox text-4xl mb-3"></i>
+                                    <p>No job descriptions yet. Create one!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ===== ANALYSIS TAB ===== -->
+                <div id="content-analysis" class="dashboard-content hidden">
+                    <div class="grid lg:grid-cols-3 gap-8">
+                        <!-- Analysis Form -->
+                        <div class="bg-white rounded-2xl shadow-lg p-8" data-aos="fade-right">
+                            <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
+                                    <i class="fas fa-search text-orange-500"></i>
+                                </div>
+                                Analyze Match
+                            </h2>
+                            
+                            <div class="space-y-5">
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Select Resume</label>
+                                    <select id="analysis-resume" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none bg-white">
+                                        <option value="">-- Select Resume --</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Select Job Description</label>
+                                    <select id="analysis-jd" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none bg-white">
+                                        <option value="">-- Select JD --</option>
+                                    </select>
+                                </div>
+                                <button type="button" onclick="analyzeMatch(event); return false;" class="w-full btn-primary text-white py-4 rounded-xl font-bold">
+    <i class="fas fa-chart-bar mr-2"></i>Analyze Match
+</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Analysis Results -->
+                        <div class="lg:col-span-2 results-container bg-white rounded-2xl shadow-lg p-8" data-aos="fade-left">
+                            <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
+                                    <i class="fas fa-chart-pie text-green-500"></i>
+                                </div>
+                                Analysis Results
+                            </h2>
+                            
+                            <div id="analysis-results" class="text-center py-10 text-gray-400">
+                                <i class="fas fa-chart-line text-6xl mb-4"></i>
+                                <p>Select a resume and job description to see the analysis</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ===== AI TAB ===== -->
+                <div id="content-ai" class="dashboard-content hidden">
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <!-- AI Tools -->
+                        <div class="space-y-6">
+                            <!-- Resume Improvement -->
+                            <div class="bg-white rounded-2xl shadow-lg p-8" data-aos="fade-right">
+                                <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
+                                        <i class="fas fa-magic text-white"></i>
+                                    </div>
+                                    AI Resume Improvement
+                                </h2>
+                                
+                                <div class="space-y-4">
+                                    <select id="ai-resume" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none bg-white">
+                                        <option value="">-- Select Resume --</option>
+                                    </select>
+                                    <button onclick="getAISuggestions()" class="w-full bg-gradient-to-r from-primary-500 to-secondary-500 text-white py-4 rounded-xl font-bold hover:opacity-90 transition-opacity">
+                                        <i class="fas fa-robot mr-2"></i>Get AI Suggestions
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Career Path -->
+                            <div class="bg-white rounded-2xl shadow-lg p-8" data-aos="fade-right" data-aos-delay="100">
+                                <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center">
+                                        <i class="fas fa-route text-white"></i>
+                                    </div>
+                                    Career Path
+                                </h2>
+                                <button onclick="getCareerPath()" class="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white py-4 rounded-xl font-bold hover:opacity-90 transition-opacity">
+                                    <i class="fas fa-map-signs mr-2"></i>Explore Career Path
+                                </button>
+                            </div>
+                            
+                            <!-- Interview Prep -->
+<div class="bg-white rounded-2xl shadow-lg p-8" data-aos="fade-right" data-aos-delay="200">
+    <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center">
+            <i class="fas fa-comments text-white"></i>
+        </div>
+        Interview Preparation
+    </h2>
+    <div class="grid grid-cols-2 gap-4 mb-4">
+        <select id="interview-resume" class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none bg-white">
+            <option value="">-- Select Resume --</option>
+        </select>
+        <select id="interview-jd" class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none bg-white">
+            <option value="">-- Select Job --</option>
+        </select>
+    </div>
+<button type="button" onclick="getInterviewPrep(event); return false;" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white py-4 rounded-xl font-bold hover:opacity-90 transition-opacity">
+    <i class="fas fa-user-tie mr-2"></i>Get Interview Prep
+</button>
+</div>
+                        
+                        <!-- AI Results -->
+                        <div class="results-container bg-white rounded-2xl shadow-lg p-8" data-aos="fade-left">
+                            <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
+                                    <i class="fas fa-sparkles text-white"></i>
+                                </div>
+                                AI Results
+                            </h2>
+                            
+                            <div id="ai-results" class="text-center py-10 text-gray-400">
+                                <i class="fas fa-robot text-6xl mb-4"></i>
+                                <p>Use the AI tools on the left to get results</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+    
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 text-center">
+            <div class="loader mx-auto mb-4"></div>
+            <p id="loading-text" class="text-gray-600 font-medium">Loading...</p>
+        </div>
+    </div>
+    
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Main JavaScript -->
+    <script src="app.js"></script>
+    <!-- Navigation Protection -->
+<script>
+(function() {
+    console.log('🛡️ Installing navigation protection...');
+    
+    var analyzing = false;
+    
+    // Block navigation when analyzing
+    var blockNav = function(e) {
+        if (analyzing) {
+            e.preventDefault();
+            e.returnValue = '';
+            console.log('🚫 NAVIGATION BLOCKED during analysis');
+            return false;
+        }
+    };
+    
+    window.addEventListener('beforeunload', blockNav);
+    
+    // Wrap analyzeMatch
+    var originalAnalyze = window.analyzeMatch;
+    window.analyzeMatch = function(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
+        analyzing = true;
+        console.log('🔒 Analysis lock ON');
+        
+        if (originalAnalyze) {
+            originalAnalyze.call(this, event);
+        }
+        
+        setTimeout(function() {
+            analyzing = false;
+            console.log('🔓 Analysis lock OFF');
+        }, 15000); // 15 seconds should be enough
+        
+        return false;
+    };
+    
+    // Wrap getInterviewPrep
+    var originalInterview = window.getInterviewPrep;
+    window.getInterviewPrep = function(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
+        analyzing = true;
+        console.log('🔒 Interview prep lock ON');
+        
+        if (originalInterview) {
+            originalInterview.call(this, event);
+        }
+        
+        setTimeout(function() {
+            analyzing = false;
+            console.log('🔓 Interview prep lock OFF');
+        }, 15000);
+        
+        return false;
+    };
+    
+    console.log('✅ Navigation protection installed!');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analyzer - AI Career Intelligence</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --dark-bg: #0f0617;
+            --dark-surface: #1a0b2e;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: var(--dark-bg);
+            color: #f0f0f0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124, 58, 237, 0.25), transparent),
+                radial-gradient(ellipse 60% 40% at 90% 50%, rgba(236, 72, 153, 0.2), transparent),
+                radial-gradient(ellipse 70% 50% at 10% 80%, rgba(6, 182, 212, 0.15), transparent);
+            z-index: 0;
+            animation: meshFloat 15s ease-in-out infinite;
+        }
+        
+        @keyframes meshFloat {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        
+        .main-container { position: relative; z-index: 2; }
+        
+        .glass-card {
+            background: rgba(26, 11, 46, 0.6);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 16px 48px rgba(124, 58, 237, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #7c3aed 0%, #ec4899 50%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% auto;
+            animation: gradientShift 3s linear infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+        
+        .btn-gradient {
+            position: relative;
+            background: linear-gradient(135deg, #7c3aed, #ec4899);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            width: 100%;
+        }
+        
+        .btn-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-gradient:hover::before { left: 100%; }
+        
+        .btn-gradient:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(124, 58, 237, 0.5);
+        }
+        
+        .input-field, .select-field {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 14px 18px;
+            color: #f0f0f0;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            font-family: 'Work Sans', sans-serif;
+            width: 100%;
+        }
+        
+        .input-field:focus, .select-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+        }
+        
+        .select-field option {
+            background: var(--dark-surface);
+            color: #f0f0f0;
+        }
+        
+        .nav-tab {
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.3px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, #7c3aed, #ec4899);
+            border-color: transparent;
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+            color: white;
+        }
+        
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 48px 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .drop-zone:hover {
+            border-color: var(--primary);
+            background: rgba(124, 58, 237, 0.05);
+        }
+        
+        .drop-zone.dragover {
+            border-color: var(--secondary);
+            background: rgba(236, 72, 153, 0.1);
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            padding: 18px 28px;
+            border-radius: 16px;
+            background: rgba(26, 11, 46, 0.95);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .toast.success { border-left: 4px solid #10b981; }
+        .toast.error { border-left: 4px solid #ef4444; }
+        .toast.warning { border-left: 4px solid #f59e0b; }
+        
+        .page-section {
+            display: none;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .page-section.active { display: block; }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.02); }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #7c3aed, #ec4899);
+            border-radius: 6px;
+        }
+        
+        #analysis-results,
+        #ai-results {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            min-height: 200px;
+        }
+        
+        .hidden { display: none !important; }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        
+        <!-- Navigation -->
+        <nav class="fixed top-0 left-0 right-0 z-50 px-8 py-4" style="background: rgba(15, 6, 23, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+            <div class="max-w-7xl mx-auto flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                        <i class="fas fa-brain text-white"></i>
+                    </div>
+                    <span class="text-2xl font-bold gradient-text">Resume Analyzer</span>
+                </div>
+                
+                <div id="auth-buttons" class="flex gap-3">
+                    <button onclick="showSection('login')" class="px-6 py-2 rounded-xl font-medium hover:bg-white/5 transition">
+                        Login
+                    </button>
+                    <button onclick="showSection('register')" class="btn-gradient">
+                        Get Started
+                    </button>
+                </div>
+                
+                <div id="user-menu" class="hidden flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <div class="status-dot"></div>
+                        <span id="user-name" class="font-medium"></span>
+                    </div>
+                    <button onclick="logout()" class="px-6 py-2 rounded-xl font-medium hover:bg-white/5 transition">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Status Bar -->
+        <div id="api-status" class="hidden"></div>
+        
+        <!-- Landing Page -->
+        <section id="landing" class="page-section active min-h-screen flex items-center justify-center px-8 pt-24">
+            <div class="max-w-6xl mx-auto text-center">
+                <div class="mb-8">
+                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm font-medium mb-6">
+                        <div class="status-dot"></div>
+                        AI-Powered Career Intelligence
+                    </span>
+                </div>
+                
+                <h1 class="text-7xl font-bold mb-6 leading-tight">
+                    Transform Your Resume<br/>
+                    <span class="gradient-text">Land Your Dream Job</span>
+                </h1>
+                
+                <p class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
+                    Advanced AI analysis to match your resume with job descriptions, 
+                    identify skill gaps, and optimize your chances of success.
+                </p>
+                
+                <div class="flex gap-4 justify-center">
+                    <button onclick="showSection('register')" class="btn-gradient text-lg px-8">
+                        <i class="fas fa-rocket mr-2"></i>Start Free Analysis
+                    </button>
+                    <button onclick="showSection('login')" class="px-8 py-4 rounded-xl bg-white/5 hover:bg-white/10 transition font-semibold">
+                        Sign In
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-8 mt-20 max-w-4xl mx-auto">
+                    <div class="glass-card p-6">
+                        <div class="text-4xl mb-3">🎯</div>
+                        <h3 class="text-lg font-bold mb-2">ATS Optimization</h3>
+                        <p class="text-sm text-gray-400">Beat applicant tracking systems with AI-powered keyword matching</p>
+                    </div>
+                    <div class="glass-card p-6">
+                        <div class="text-4xl mb-3">📊</div>
+                        <h3 class="text-lg font-bold mb-2">Match Analysis</h3>
+                        <p class="text-sm text-gray-400">Get precise compatibility scores for every job application</p>
+                    </div>
+                    <div class="glass-card p-6">
+                        <div class="text-4xl mb-3">🚀</div>
+                        <h3 class="text-lg font-bold mb-2">Career Growth</h3>
+                        <p class="text-sm text-gray-400">Personalized recommendations to accelerate your career</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Login Page -->
+        <section id="login" class="page-section min-h-screen flex items-center justify-center px-8 pt-24">
+            <div class="glass-card p-10 w-full max-w-md">
+                <h2 class="text-3xl font-bold mb-2">Welcome Back</h2>
+                <p class="text-gray-400 mb-8">Sign in to continue your career journey</p>
+                
+                <form id="login-form" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Email</label>
+                        <input type="email" id="login-email" class="input-field" placeholder="your@email.com" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Password</label>
+                        <input type="password" id="login-password" class="input-field" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-gradient">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Sign In
+                    </button>
+                </form>
+                
+                <p class="text-center mt-6 text-gray-400">
+                    Don't have an account? 
+                    <button onclick="showSection('register')" class="text-purple-400 hover:text-purple-300 font-medium">
+                        Sign up
+                    </button>
+                </p>
+            </div>
+        </section>
+        
+        <!-- Register Page -->
+        <section id="register" class="page-section min-h-screen flex items-center justify-center px-8 pt-24">
+            <div class="glass-card p-10 w-full max-w-md">
+                <h2 class="text-3xl font-bold mb-2">Create Account</h2>
+                <p class="text-gray-400 mb-8">Start your AI-powered career journey</p>
+                
+                <form id="register-form" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Full Name</label>
+                        <input type="text" id="reg-name" class="input-field" placeholder="John Doe" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Email</label>
+                        <input type="email" id="reg-email" class="input-field" placeholder="your@email.com" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Password</label>
+                        <input type="password" id="reg-password" class="input-field" placeholder="••••••••" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">I am a</label>
+                        <select id="reg-role" class="select-field" required>
+                            <option value="student">Student</option>
+                            <option value="employee">Employee</option>
+                            <option value="hr">HR/Recruiter</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-gradient">
+                        <i class="fas fa-user-plus mr-2"></i>Create Account
+                    </button>
+                </form>
+                
+                <p class="text-center mt-6 text-gray-400">
+                    Already have an account? 
+                    <button onclick="showSection('login')" class="text-purple-400 hover:text-purple-300 font-medium">
+                        Sign in
+                    </button>
+                </p>
+            </div>
+        </section>
+        
+        <!-- Dashboard -->
+        <section id="dashboard" class="page-section min-h-screen px-8 pt-28 pb-12">
+            <div class="max-w-7xl mx-auto">
+                
+                <!-- Header -->
+                <div class="mb-8">
+                    <h1 class="text-4xl font-bold mb-2">
+                        Welcome back, <span id="dashboard-user-name" class="gradient-text">User</span>
+                    </h1>
+                    <p class="text-gray-400">Analyze, optimize, and accelerate your career</p>
+                </div>
+                
+                <!-- Tabs -->
+                <div class="flex gap-3 mb-8 flex-wrap">
+                    <button id="tab-resumes" onclick="showDashboardTab('resumes')" class="nav-tab active">
+                        <i class="fas fa-file-alt mr-2"></i>Resumes
+                    </button>
+                    <button id="tab-jobs" onclick="showDashboardTab('jobs')" class="nav-tab">
+                        <i class="fas fa-briefcase mr-2"></i>Job Descriptions
+                    </button>
+                    <button id="tab-analysis" onclick="showDashboardTab('analysis')" class="nav-tab">
+                        <i class="fas fa-chart-bar mr-2"></i>Analysis
+                    </button>
+                    <button id="tab-ai" onclick="showDashboardTab('ai')" class="nav-tab">
+                        <i class="fas fa-robot mr-2"></i>AI Tools
+                    </button>
+                </div>
+                
+                <!-- Resumes Tab -->
+                <div id="content-resumes" class="dashboard-content">
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div class="glass-card p-8">
+                            <h2 class="text-2xl font-bold mb-6">
+                                <i class="fas fa-cloud-upload-alt mr-3 text-purple-400"></i>
+                                Upload Resume
+                            </h2>
+                            
+                            <div id="drop-zone" class="drop-zone mb-6">
+                                <div class="text-6xl mb-4">📄</div>
+                                <p class="font-semibold text-lg mb-2">Drop your resume here</p>
+                                <p class="text-sm text-gray-400">or click to browse (PDF, DOCX)</p>
+                            </div>
+                            <input type="file" id="resume-file" accept=".pdf,.docx,.doc" class="hidden">
+                            
+                            <button id="upload-btn" onclick="uploadResume()" disabled class="btn-gradient opacity-50 cursor-not-allowed">
+                                <i class="fas fa-upload mr-2"></i>Upload Resume
+                            </button>
+                        </div>
+                        
+                        <div class="glass-card p-8">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-2xl font-bold">
+                                    <i class="fas fa-list mr-3 text-pink-400"></i>
+                                    My Resumes
+                                </h2>
+                                <button onclick="loadResumes()" class="text-purple-400 hover:text-purple-300 font-medium">
+                                    <i class="fas fa-sync-alt mr-1"></i>Refresh
+                                </button>
+                            </div>
+                            
+                            <div id="resumes-list" class="space-y-3 max-h-96 overflow-y-auto">
+                                <div class="text-center py-10 text-gray-500">
+                                    <i class="fas fa-inbox text-5xl mb-3"></i>
+                                    <p>No resumes yet. Upload one!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Jobs Tab -->
+                <div id="content-jobs" class="dashboard-content hidden">
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div class="glass-card p-8">
+                            <h2 class="text-2xl font-bold mb-6">
+                                <i class="fas fa-plus-circle mr-3 text-purple-400"></i>
+                                Create Job Description
+                            </h2>
+                            
+                            <form id="jd-form" class="space-y-5">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Job Title</label>
+                                    <input type="text" id="jd-title" class="input-field" placeholder="e.g., Senior Software Engineer" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Company (Optional)</label>
+                                    <input type="text" id="jd-company" class="input-field" placeholder="e.g., Google">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Job Description</label>
+                                    <textarea id="jd-description" class="input-field min-h-32" placeholder="Paste the full job description here..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn-gradient">
+                                    <i class="fas fa-save mr-2"></i>Save Job Description
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div class="glass-card p-8">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-2xl font-bold">
+                                    <i class="fas fa-list mr-3 text-pink-400"></i>
+                                    Saved Jobs
+                                </h2>
+                                <button onclick="loadJDs()" class="text-purple-400 hover:text-purple-300 font-medium">
+                                    <i class="fas fa-sync-alt mr-1"></i>Refresh
+                                </button>
+                            </div>
+                            
+                            <div id="jds-list" class="space-y-3 max-h-96 overflow-y-auto">
+                                <div class="text-center py-10 text-gray-500">
+                                    <i class="fas fa-inbox text-5xl mb-3"></i>
+                                    <p>No job descriptions yet. Create one!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Analysis Tab -->
+                <div id="content-analysis" class="dashboard-content hidden">
+                    <div class="grid lg:grid-cols-3 gap-8">
+                        <div class="glass-card p-8">
+                            <h2 class="text-2xl font-bold mb-6">
+                                <i class="fas fa-search mr-3 text-orange-400"></i>
+                                Analyze Match
+                            </h2>
+                            
+                            <div class="space-y-5">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Select Resume</label>
+                                    <select id="analysis-resume" class="select-field">
+                                        <option value="">-- Select Resume --</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Select Job</label>
+                                    <select id="analysis-jd" class="select-field">
+                                        <option value="">-- Select Job --</option>
+                                    </select>
+                                </div>
+                                <button onclick="analyzeMatch(event); return false;" class="btn-gradient">
+                                    <i class="fas fa-chart-bar mr-2"></i>Analyze Match
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="lg:col-span-2 glass-card p-8">
+                            <h2 class="text-2xl font-bold mb-6">
+                                <i class="fas fa-chart-pie mr-3 text-green-400"></i>
+                                Analysis Results
+                            </h2>
+                            
+                            <div id="analysis-results" class="text-center py-10 text-gray-500">
+                                <i class="fas fa-chart-line text-6xl mb-4"></i>
+                                <p>Select a resume and job to see the analysis</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Tools Tab -->
+                <div id="content-ai" class="dashboard-content hidden">
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div class="space-y-6">
+                            <div class="glass-card p-8">
+                                <h2 class="text-2xl font-bold mb-6">
+                                    <i class="fas fa-magic mr-3 text-purple-400"></i>
+                                    AI Resume Improvement
+                                </h2>
+                                
+                                <div class="space-y-4">
+                                    <select id="ai-resume" class="select-field">
+                                        <option value="">-- Select Resume --</option>
+                                    </select>
+                                    <button onclick="getAISuggestions()" class="btn-gradient">
+                                        <i class="fas fa-robot mr-2"></i>Get AI Suggestions
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="glass-card p-8">
+                                <h2 class="text-2xl font-bold mb-6">
+                                    <i class="fas fa-comments mr-3 text-yellow-400"></i>
+                                    Interview Preparation
+                                </h2>
+                                
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <select id="interview-resume" class="select-field">
+                                        <option value="">-- Resume --</option>
+                                    </select>
+                                    <select id="interview-jd" class="select-field">
+                                        <option value="">-- Job --</option>
+                                    </select>
+                                </div>
+                                <button onclick="getInterviewPrep(event); return false;" class="btn-gradient">
+                                    <i class="fas fa-user-tie mr-2"></i>Get Interview Prep
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card p-8">
+                            <h2 class="text-2xl font-bold mb-6">
+                                <i class="fas fa-sparkles mr-3 text-pink-400"></i>
+                                AI Results
+                            </h2>
+                            
+                            <div id="ai-results" class="text-center py-10 text-gray-500">
+                                <i class="fas fa-robot text-6xl mb-4"></i>
+                                <p>Use the AI tools to get results</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div class="glass-card p-8 text-center">
+            <div class="spinner mx-auto mb-4"></div>
+            <p id="loading-text" class="text-lg font-medium">Loading...</p>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+    
+    <!-- Include your app.js -->
+    <script src="app.js"></script>
+    
+    <!-- BUILT-IN REDIRECT FIX -->
+    <script>
+    (function() {
+        console.log('🛡️ Navigation protection installed');
+        
+        // Global navigation lock
+        window._navigationLocked = false;
+        
+        window.lockNavigation = function() {
+            window._navigationLocked = true;
+            console.log('🔒 Navigation LOCKED');
+        };
+        
+        window.unlockNavigation = function() {
+            window._navigationLocked = false;
+            console.log('🔓 Navigation UNLOCKED');
+        };
+        
+        // Intercept showSection
+        var originalShowSection = window.showSection;
+        window.showSection = function(sectionId) {
+            if (window._navigationLocked && sectionId !== 'dashboard') {
+                console.log('🚫 BLOCKED navigation to', sectionId);
+                return false;
+            }
+            if (originalShowSection) {
+                return originalShowSection.apply(this, arguments);
+            }
+        };
+        
+        // Enhanced analyzeMatch wrapper
+        setTimeout(function() {
+            if (window.analyzeMatch) {
+                var _origAnalyze = window.analyzeMatch;
+                window.analyzeMatch = function(e) {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                    }
+                    
+                    window.lockNavigation();
+                    
+                    if (_origAnalyze) _origAnalyze.call(this, e);
+                    
+                    setTimeout(function() {
+                        window.unlockNavigation();
+                    }, 12000);
+                    
+                    return false;
+                };
+            }
+            
+            // Enhanced getInterviewPrep wrapper
+            if (window.getInterviewPrep) {
+                var _origInterview = window.getInterviewPrep;
+                window.getInterviewPrep = function(e) {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                    }
+                    
+                    window.lockNavigation();
+                    
+                    if (_origInterview) _origInterview.call(this, e);
+                    
+                    setTimeout(function() {
+                        window.unlockNavigation();
+                    }, 12000);
+                    
+                    return false;
+                };
+            }
+            
+            console.log('✅ Navigation protection fully active');
+        }, 1000);
+    })();
+    </script>
+</body>
+</html>
