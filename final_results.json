@@ -1,0 +1,40 @@
+{
+  "experiment_info": {
+    "dataset_size": {
+      "resumes": 50,
+      "jds": 50,
+      "total_pairs": 2500
+    },
+    "date": "2026-04-01 12:22:46"
+  },
+  "tfidf": {
+    "method": "TF-IDF Baseline",
+    "model": "sklearn TfidfVectorizer",
+    "top1_accuracy": 8.0,
+    "top5_accuracy": 52.0,
+    "mean_similarity": 0.03536108712004717,
+    "max_similarity": 0.6402490084356394,
+    "min_similarity": 0.0,
+    "std_similarity": 0.07711368778044217,
+    "processing_time_seconds": 0.13807034492492676
+  },
+  "embeddings": {
+    "method": "Sentence Transformers",
+    "model": "all-MiniLM-L6-v2",
+    "embedding_dimension": 384,
+    "top1_accuracy": 10.0,
+    "top5_accuracy": 50.0,
+    "mean_similarity": 0.38853684067726135,
+    "max_similarity": 0.8432818651199341,
+    "min_similarity": 0.10769025981426239,
+    "std_similarity": 0.1315433531999588,
+    "processing_time_seconds": 15.470189094543457
+  },
+  "comparison": {
+    "similarity_improvement_percent": 998.7695015094408,
+    "top1_accuracy_improvement": 2.0,
+    "top5_accuracy_improvement": -2.0,
+    "speed_overhead_multiplier": 112.04570469462571,
+    "key_finding": "Sentence Transformers achieve 998.8% higher mean similarity scores with 112.0x processing overhead"
+  }
+}

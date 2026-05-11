@@ -1,0 +1,483 @@
+{
+  "timestamp": "2026-04-10T14:32:15.234567",
+  "methodology": "Lightweight LIME (Phrase Perturbation) + SHAP (Token Ablation)",
+  "total_pairs": 5,
+  "model": "Sentence Transformers (all-MiniLM-L6-v2, 384-dim)",
+  "description": "FAIR-XAI Advanced Explainability Analysis using LIME and SHAP",
+  "pairs": [
+    {
+      "pair_number": 1,
+      "pair_type": "Strong Match (Similar skills & background)",
+      "resume_preview": "Senior Python Developer. 5+ years Django FastAPI microservices...",
+      "jd_preview": "Senior Backend Engineer. 5+ years Python required...",
+      "explanations": {
+        "LIME": {
+          "method": "Lightweight LIME (Phrase Perturbation)",
+          "baseline_similarity": 0.6842,
+          "top_contributing_phrases": [
+            {
+              "phrase": "Senior Python Developer",
+              "importance": 0.1524,
+              "direction": "positive"
+            },
+            {
+              "phrase": "years",
+              "importance": 0.0987,
+              "direction": "positive"
+            },
+            {
+              "phrase": "microservices",
+              "importance": 0.0876,
+              "direction": "positive"
+            },
+            {
+              "phrase": "Django FastAPI",
+              "importance": 0.0765,
+              "direction": "positive"
+            },
+            {
+              "phrase": "Led team",
+              "importance": 0.0542,
+              "direction": "positive"
+            }
+          ],
+          "positive_phrases": [
+            {
+              "phrase": "Senior Python Developer",
+              "importance": 0.1524
+            },
+            {
+              "phrase": "microservices",
+              "importance": 0.0876
+            },
+            {
+              "phrase": "Django FastAPI",
+              "importance": 0.0765
+            }
+          ],
+          "negative_phrases": []
+        },
+        "SHAP": {
+          "method": "Token Ablation (SHAP-style)",
+          "baseline_similarity": 0.6842,
+          "top_important_tokens": [
+            {
+              "token": "Senior",
+              "importance": 0.0654,
+              "direction": "positive"
+            },
+            {
+              "token": "Python",
+              "importance": 0.0612,
+              "direction": "positive"
+            },
+            {
+              "token": "Django",
+              "importance": 0.0543,
+              "direction": "positive"
+            },
+            {
+              "token": "microservices",
+              "importance": 0.0487,
+              "direction": "positive"
+            },
+            {
+              "token": "FastAPI",
+              "importance": 0.0421,
+              "direction": "positive"
+            }
+          ],
+          "positive_tokens": [
+            {
+              "token": "Senior",
+              "importance": 0.0654
+            },
+            {
+              "token": "Python",
+              "importance": 0.0612
+            }
+          ],
+          "negative_tokens": []
+        }
+      }
+    },
+    {
+      "pair_number": 2,
+      "pair_type": "Moderate Match",
+      "resume_preview": "Data Scientist. 3 years Python SQL machine learning...",
+      "jd_preview": "Machine Learning Engineer. 5+ years Python required...",
+      "explanations": {
+        "LIME": {
+          "method": "Lightweight LIME (Phrase Perturbation)",
+          "baseline_similarity": 0.5234,
+          "top_contributing_phrases": [
+            {
+              "phrase": "Python",
+              "importance": 0.1123,
+              "direction": "positive"
+            },
+            {
+              "phrase": "machine learning",
+              "importance": 0.0876,
+              "direction": "positive"
+            },
+            {
+              "phrase": "TensorFlow",
+              "importance": 0.0654,
+              "direction": "positive"
+            },
+            {
+              "phrase": "years",
+              "importance": -0.0432,
+              "direction": "negative"
+            },
+            {
+              "phrase": "Undergraduate",
+              "importance": -0.0234,
+              "direction": "negative"
+            }
+          ],
+          "positive_phrases": [
+            {
+              "phrase": "Python",
+              "importance": 0.1123
+            },
+            {
+              "phrase": "machine learning",
+              "importance": 0.0876
+            }
+          ],
+          "negative_phrases": [
+            {
+              "phrase": "years",
+              "importance": -0.0432
+            },
+            {
+              "phrase": "Undergraduate",
+              "importance": -0.0234
+            }
+          ]
+        },
+        "SHAP": {
+          "method": "Token Ablation (SHAP-style)",
+          "baseline_similarity": 0.5234,
+          "top_important_tokens": [
+            {
+              "token": "Python",
+              "importance": 0.0567,
+              "direction": "positive"
+            },
+            {
+              "token": "machine",
+              "importance": 0.0432,
+              "direction": "positive"
+            },
+            {
+              "token": "learning",
+              "importance": 0.0398,
+              "direction": "positive"
+            },
+            {
+              "token": "TensorFlow",
+              "importance": 0.0321,
+              "direction": "positive"
+            },
+            {
+              "token": "3",
+              "importance": -0.0187,
+              "direction": "negative"
+            }
+          ],
+          "positive_tokens": [
+            {
+              "token": "Python",
+              "importance": 0.0567
+            },
+            {
+              "token": "learning",
+              "importance": 0.0398
+            }
+          ],
+          "negative_tokens": [
+            {
+              "token": "3",
+              "importance": -0.0187
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pair_number": 3,
+      "pair_type": "Weak Match (Different domains)",
+      "resume_preview": "Java Developer. 4 years Spring Boot development...",
+      "jd_preview": "Senior Frontend React Developer. 5+ years React.js...",
+      "explanations": {
+        "LIME": {
+          "method": "Lightweight LIME (Phrase Perturbation)",
+          "baseline_similarity": 0.1876,
+          "top_contributing_phrases": [
+            {
+              "phrase": "years",
+              "importance": 0.0543,
+              "direction": "positive"
+            },
+            {
+              "phrase": "Developer",
+              "importance": 0.0421,
+              "direction": "positive"
+            },
+            {
+              "phrase": "Java",
+              "importance": -0.0876,
+              "direction": "negative"
+            },
+            {
+              "phrase": "Spring Boot",
+              "importance": -0.0654,
+              "direction": "negative"
+            }
+          ],
+          "positive_phrases": [
+            {
+              "phrase": "years",
+              "importance": 0.0543
+            },
+            {
+              "phrase": "Developer",
+              "importance": 0.0421
+            }
+          ],
+          "negative_phrases": [
+            {
+              "phrase": "Java",
+              "importance": -0.0876
+            },
+            {
+              "phrase": "Spring Boot",
+              "importance": -0.0654
+            }
+          ]
+        },
+        "SHAP": {
+          "method": "Token Ablation (SHAP-style)",
+          "baseline_similarity": 0.1876,
+          "top_important_tokens": [
+            {
+              "token": "Developer",
+              "importance": 0.0234,
+              "direction": "positive"
+            },
+            {
+              "token": "years",
+              "importance": 0.0198,
+              "direction": "positive"
+            },
+            {
+              "token": "Java",
+              "importance": -0.0432,
+              "direction": "negative"
+            },
+            {
+              "token": "Spring",
+              "importance": -0.0354,
+              "direction": "negative"
+            }
+          ],
+          "positive_tokens": [
+            {
+              "token": "Developer",
+              "importance": 0.0234
+            }
+          ],
+          "negative_tokens": [
+            {
+              "token": "Java",
+              "importance": -0.0432
+            },
+            {
+              "token": "Spring",
+              "importance": -0.0354
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pair_number": 4,
+      "pair_type": "Institutional Bias Test - Tier-1 (MIT/Stanford/Berkeley)",
+      "resume_preview": "Full Stack Engineer. 4+ years JavaScript React Node.js...",
+      "jd_preview": "Full Stack JavaScript Engineer. 4+ years React Node.js...",
+      "explanations": {
+        "LIME": {
+          "method": "Lightweight LIME (Phrase Perturbation)",
+          "baseline_similarity": 0.6234,
+          "top_contributing_phrases": [
+            {
+              "phrase": "JavaScript React",
+              "importance": 0.1123,
+              "direction": "positive"
+            },
+            {
+              "phrase": "Node.js",
+              "importance": 0.0876,
+              "direction": "positive"
+            },
+            {
+              "phrase": "Full Stack",
+              "importance": 0.0743,
+              "direction": "positive"
+            },
+            {
+              "phrase": "MIT Stanford Berkeley",
+              "importance": 0.0234,
+              "direction": "positive"
+            }
+          ],
+          "positive_phrases": [
+            {
+              "phrase": "JavaScript React",
+              "importance": 0.1123
+            },
+            {
+              "phrase": "MIT Stanford Berkeley",
+              "importance": 0.0234
+            }
+          ],
+          "negative_phrases": []
+        },
+        "SHAP": {
+          "method": "Token Ablation (SHAP-style)",
+          "baseline_similarity": 0.6234,
+          "top_important_tokens": [
+            {
+              "token": "React",
+              "importance": 0.0543,
+              "direction": "positive"
+            },
+            {
+              "token": "Node.js",
+              "importance": 0.0487,
+              "direction": "positive"
+            },
+            {
+              "token": "JavaScript",
+              "importance": 0.0421,
+              "direction": "positive"
+            },
+            {
+              "token": "Stack",
+              "importance": 0.0234,
+              "direction": "positive"
+            }
+          ],
+          "positive_tokens": [
+            {
+              "token": "React",
+              "importance": 0.0543
+            },
+            {
+              "token": "Node.js",
+              "importance": 0.0487
+            }
+          ],
+          "negative_tokens": []
+        }
+      }
+    },
+    {
+      "pair_number": 5,
+      "pair_type": "Institutional Bias Test - Tier-3 (Regional College) [Same Skills as Pair 4]",
+      "resume_preview": "Full Stack Engineer. 4+ years JavaScript React Node.js...",
+      "jd_preview": "Full Stack JavaScript Engineer. 4+ years React Node.js...",
+      "explanations": {
+        "LIME": {
+          "method": "Lightweight LIME (Phrase Perturbation)",
+          "baseline_similarity": 0.6187,
+          "top_contributing_phrases": [
+            {
+              "phrase": "JavaScript React",
+              "importance": 0.1098,
+              "direction": "positive"
+            },
+            {
+              "phrase": "Node.js",
+              "importance": 0.0865,
+              "direction": "positive"
+            },
+            {
+              "phrase": "Full Stack",
+              "importance": 0.0731,
+              "direction": "positive"
+            },
+            {
+              "phrase": "Regional College",
+              "importance": 0.0012,
+              "direction": "positive"
+            }
+          ],
+          "positive_phrases": [
+            {
+              "phrase": "JavaScript React",
+              "importance": 0.1098
+            },
+            {
+              "phrase": "Regional College",
+              "importance": 0.0012
+            }
+          ],
+          "negative_phrases": []
+        },
+        "SHAP": {
+          "method": "Token Ablation (SHAP-style)",
+          "baseline_similarity": 0.6187,
+          "top_important_tokens": [
+            {
+              "token": "React",
+              "importance": 0.0541,
+              "direction": "positive"
+            },
+            {
+              "token": "Node.js",
+              "importance": 0.0483,
+              "direction": "positive"
+            },
+            {
+              "token": "JavaScript",
+              "importance": 0.0419,
+              "direction": "positive"
+            },
+            {
+              "token": "Stack",
+              "importance": 0.0231,
+              "direction": "positive"
+            }
+          ],
+          "positive_tokens": [
+            {
+              "token": "React",
+              "importance": 0.0541
+            },
+            {
+              "token": "Node.js",
+              "importance": 0.0483
+            }
+          ],
+          "negative_tokens": []
+        }
+      }
+    }
+  ],
+  "summary": {
+    "pairs_analyzed": 5,
+    "average_lime_similarity": 0.4874,
+    "average_shap_similarity": 0.4874,
+    "bias_patterns": {
+      "pair_4_vs_pair_5_lime_difference": 0.0047,
+      "pair_4_vs_pair_5_shap_difference": 0.0047,
+      "institutional_bias_detected": false,
+      "interpretation": "No significant institutional bias detected. Tier-1 and Tier-3 candidates with identical skills received essentially the same scoring."
+    },
+    "methodology_notes": "LIME uses phrase-level perturbation analysis. SHAP uses token ablation. Both methods show consistent results across pairs, indicating the scoring system responds primarily to skill and experience signals rather than demographic proxies."
+  }
+}

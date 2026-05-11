@@ -1,0 +1,14 @@
+{
+  "method": "permutation",
+  "features": [
+    "id"
+  ],
+  "importance": {
+    "features": [
+      "id"
+    ],
+    "importance_scores": [
+      100.0
+    ]
+  }
+}

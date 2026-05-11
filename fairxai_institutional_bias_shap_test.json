@@ -1,0 +1,122 @@
+{
+  "test": "Institutional Bias via SHAP Token Ablation",
+  "timestamp": "2026-04-10",
+  "methodology": "Compare SHAP values for identical skills from different institutions",
+  "results": {
+    "tier_1": {
+      "institution": "MIT (Tier-1)",
+      "resume": "Full Stack Engineer 4 years JavaScript React Node.js Express. REST APIs microservices deployment. Database design optimization. MS from MIT.",
+      "baseline_similarity": 0.8817218542098999,
+      "top_positive_tokens": [
+        {
+          "token": "years",
+          "shap_value": 0.0443,
+          "direction": "positive"
+        },
+        {
+          "token": "microservices",
+          "shap_value": 0.0211,
+          "direction": "positive"
+        },
+        {
+          "token": "4",
+          "shap_value": 0.0153,
+          "direction": "positive"
+        },
+        {
+          "token": "design",
+          "shap_value": 0.001,
+          "direction": "positive"
+        }
+      ],
+      "shap_values": {
+        "full": 0.0,
+        "stack": 0.0,
+        "engineer": 0.0,
+        "4": 0.0153,
+        "years": 0.0443,
+        "javascript": 0.0,
+        "react": 0.0,
+        "node.js": 0.0,
+        "express": 0.0,
+        "rest": 0.0,
+        "apis": 0.0,
+        "microservices": 0.0211,
+        "deployment": -0.0066,
+        "database": 0.0,
+        "design": 0.001,
+        "optimization": -0.0204,
+        "ms": 0.0,
+        "from": -0.0019,
+        "mit": 0.0
+      }
+    },
+    "tier_3": {
+      "institution": "Regional College (Tier-3)",
+      "resume": "Full Stack Engineer 4 years JavaScript React Node.js Express. REST APIs microservices deployment. Database design optimization. MS from Regional College.",
+      "baseline_similarity": 0.8921987414360046,
+      "top_positive_tokens": [
+        {
+          "token": "years",
+          "shap_value": 0.0385,
+          "direction": "positive"
+        },
+        {
+          "token": "microservices",
+          "shap_value": 0.0255,
+          "direction": "positive"
+        },
+        {
+          "token": "4",
+          "shap_value": 0.0154,
+          "direction": "positive"
+        },
+        {
+          "token": "from",
+          "shap_value": 0.0052,
+          "direction": "positive"
+        },
+        {
+          "token": "design",
+          "shap_value": 0.0019,
+          "direction": "positive"
+        }
+      ],
+      "shap_values": {
+        "full": 0.0,
+        "stack": 0.0,
+        "engineer": 0.0,
+        "4": 0.0154,
+        "years": 0.0385,
+        "javascript": 0.0,
+        "react": 0.0,
+        "node.js": 0.0,
+        "express": 0.0,
+        "rest": 0.0,
+        "apis": 0.0,
+        "microservices": 0.0255,
+        "deployment": -0.0055,
+        "database": 0.0,
+        "design": 0.0019,
+        "optimization": -0.0183,
+        "ms": 0.0,
+        "from": 0.0052,
+        "regional": 0.0,
+        "college": 0.0
+      }
+    }
+  },
+  "comparison": {
+    "tier1_score": 0.8817,
+    "tier3_score": 0.8922,
+    "absolute_difference": -0.0105,
+    "percentage_difference": -1.17,
+    "institution_contribution_tier1": 0.0,
+    "institution_contribution_tier3": 0.0
+  },
+  "conclusion": {
+    "bias_detected": false,
+    "magnitude": "-1.17%",
+    "interpretation": "No significant institutional bias"
+  }
+}

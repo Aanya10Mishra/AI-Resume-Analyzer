@@ -1,0 +1,162 @@
+WARNING:root:\u26a0\ufe0f  SHAP not installed. Install with: pip install shap
+INFO:fairxai_data_loader:\u2705 Data loader initialized
+INFO:fairxai_data_loader:   Downloads: C:\Users\Manvi\Downloads
+INFO:fairxai_data_loader:   Project: C:\Users\Manvi\Documents\AI Resume Analyzer
+INFO:fairxai_data_loader:
+================================================================================
+INFO:fairxai_data_loader:LOADING KAGGLE DATASET (REAL DATA)
+INFO:fairxai_data_loader:================================================================================
+INFO:fairxai_data_loader:\U0001f4c2 Loading from: C:\Users\Manvi\Downloads\preprocessed_resumes (1).csv
+INFO:fairxai_data_loader:\u2705 Loaded: 2484 records, 6 columns
+INFO:fairxai_data_loader:
+\U0001f4ca Columns found:
+INFO:fairxai_data_loader:   - gender
+INFO:fairxai_data_loader:   - education
+INFO:fairxai_data_loader:   - skills
+INFO:fairxai_data_loader:   - experience
+INFO:fairxai_data_loader:   - category
+INFO:fairxai_data_loader:   - clean_text
+WARNING:fairxai_data_loader:\u26a0\ufe0f  'prediction' column not found
+INFO:fairxai_data_loader:    You need to add binary predictions (0/1) for fairness analysis
+INFO:fairxai_data_loader:
+\u2705 Processed Kaggle data:
+INFO:fairxai_data_loader:   Records: 2484
+INFO:fairxai_data_loader:   Columns: ['id', 'job_category', 'gender', 'experience_level', 'prediction', 'prediction_score', 'clean_text']
+INFO:fairxai_data_loader:
+================================================================================
+INFO:fairxai_data_loader:EXPLORING KAGGLE DATA
+INFO:fairxai_data_loader:================================================================================
+INFO:fairxai_data_loader:
+\U0001f4ca Shape: 2484 rows ╫ 7 columns
+INFO:fairxai_data_loader:
+\U0001f4cb Columns & Types:
+INFO:fairxai_data_loader:   id                   (int64) - 0 missing (0.0%)
+INFO:fairxai_data_loader:   job_category         (str) - 0 missing (0.0%)
+INFO:fairxai_data_loader:   gender               (str) - 0 missing (0.0%)
+INFO:fairxai_data_loader:   experience_level     (category) - 148 missing (6.0%)
+INFO:fairxai_data_loader:   prediction           (int32) - 0 missing (0.0%)
+INFO:fairxai_data_loader:   prediction_score     (float64) - 0 missing (0.0%)
+INFO:fairxai_data_loader:   clean_text           (str) - 1 missing (0.0%)
+INFO:fairxai_data_loader:
+\U0001f4c8 Key Distributions:
+INFO:fairxai_data_loader:
+   gender:
+INFO:fairxai_data_loader:      Female: 1248 (50.2%)
+INFO:fairxai_data_loader:      Male: 1236 (49.8%)
+INFO:fairxai_data_loader:
+   experience_level:
+INFO:fairxai_data_loader:      senior: 1246 (50.2%)
+INFO:fairxai_data_loader:      mid: 759 (30.6%)
+INFO:fairxai_data_loader:      entry: 331 (13.3%)
+INFO:fairxai_data_loader:
+   prediction:
+INFO:fairxai_data_loader:      0: 1291 (52.0%)
+INFO:fairxai_data_loader:      1: 1193 (48.0%)
+INFO:fairxai_data_loader:
+\U0001f4ca Numeric Statistics:
+INFO:fairxai_data_loader:   id: mean=1241.50, std=717.21, min=0.00, max=2483.00
+INFO:fairxai_data_loader:   prediction: mean=0.48, std=0.50, min=0.00, max=1.00
+INFO:fairxai_data_loader:   prediction_score: mean=0.49, std=0.28, min=0.00, max=1.00
+INFO:fairxai_data_loader:\u2705 Saved: C:\Users\Manvi\Documents\AI Resume Analyzer\fairxai_kaggle_processed.csv
+INFO:fairxai_data_loader:
+================================================================================
+INFO:fairxai_data_loader:LOADING SYNTHETIC DATASET (BALANCED 600)
+INFO:fairxai_data_loader:================================================================================
+INFO:fairxai_data_loader:\U0001f4c2 Loading from: C:\Users\Manvi\Downloads\Resume_Dataset_600_Balanced (1).xlsx
+INFO:fairxai_data_loader:\u2705 Loaded: 600 records, 7 columns
+INFO:fairxai_data_loader:
+\U0001f4ca Columns found:
+INFO:fairxai_data_loader:   - ID
+INFO:fairxai_data_loader:   - Gender
+INFO:fairxai_data_loader:   - College_Tier
+INFO:fairxai_data_loader:   - Skills_Level
+INFO:fairxai_data_loader:   - Experience
+INFO:fairxai_data_loader:   - Label
+INFO:fairxai_data_loader:   - Test_Purpose
+INFO:fairxai_data_loader:
+\u2705 Processed Synthetic data:
+INFO:fairxai_data_loader:   Records: 600
+INFO:fairxai_data_loader:   Columns: ['id', 'gender', 'experience_level', 'years_experience', 'prediction', 'prediction_score', 'clean_text']
+INFO:fairxai_data_loader:
+\U0001f4ca Distribution:
+INFO:fairxai_data_loader:   Gender: {'Male': 300, 'Female': 300}
+INFO:fairxai_data_loader:   Experience: {'Tier1': 200, 'Tier2': 200, 'Tier3': 200}
+INFO:fairxai_data_loader:
+================================================================================
+INFO:fairxai_data_loader:EXPLORING SYNTHETIC DATA
+INFO:fairxai_data_loader:================================================================================
+INFO:fairxai_data_loader:
+\U0001f4ca Shape: 600 rows ╫ 7 columns
+INFO:fairxai_data_loader:
+\U0001f4cb Columns & Types:
+INFO:fairxai_data_loader:   id                   (str) - 0 missing (0.0%)
+INFO:fairxai_data_loader:   gender               (str) - 0 missing (0.0%)
+INFO:fairxai_data_loader:   experience_level     (str) - 0 missing (0.0%)
+INFO:fairxai_data_loader:   years_experience     (int64) - 0 missing (0.0%)
+INFO:fairxai_data_loader:   prediction           (int32) - 0 missing (0.0%)
+INFO:fairxai_data_loader:   prediction_score     (float64) - 0 missing (0.0%)
+INFO:fairxai_data_loader:   clean_text           (str) - 0 missing (0.0%)
+INFO:fairxai_data_loader:
+\U0001f4c8 Key Distributions:
+INFO:fairxai_data_loader:
+   gender:
+INFO:fairxai_data_loader:      Male: 300 (50.0%)
+INFO:fairxai_data_loader:      Female: 300 (50.0%)
+INFO:fairxai_data_loader:
+   experience_level:
+INFO:fairxai_data_loader:      Tier1: 200 (33.3%)
+INFO:fairxai_data_loader:      Tier2: 200 (33.3%)
+INFO:fairxai_data_loader:      Tier3: 200 (33.3%)
+INFO:fairxai_data_loader:
+   prediction:
+INFO:fairxai_data_loader:      0: 400 (66.7%)
+INFO:fairxai_data_loader:      1: 200 (33.3%)
+INFO:fairxai_data_loader:
+\U0001f4ca Numeric Statistics:
+INFO:fairxai_data_loader:   years_experience: mean=2.28, std=2.03, min=0.00, max=5.00
+INFO:fairxai_data_loader:   prediction: mean=0.33, std=0.47, min=0.00, max=1.00
+INFO:fairxai_data_loader:   prediction_score: mean=0.35, std=0.44, min=0.00, max=1.00
+INFO:fairxai_data_loader:\u2705 Saved: C:\Users\Manvi\Documents\AI Resume Analyzer\fairxai_synthetic_processed.csv
+INFO:fairxai_data_loader:
+================================================================================
+INFO:fairxai_data_loader:MERGING DATASETS FOR COMPARATIVE ANALYSIS
+INFO:fairxai_data_loader:================================================================================
+INFO:fairxai_data_loader:\u2705 Combined dataset:
+INFO:fairxai_data_loader:   Total records: 3084
+INFO:fairxai_data_loader:   Kaggle: 2484
+INFO:fairxai_data_loader:   Synthetic: 600
+INFO:fairxai_data_loader:
+   Source distribution:
+INFO:fairxai_data_loader:   Real (Kaggle): 2484
+INFO:fairxai_data_loader:   Synthetic (Controlled): 600
+INFO:fairxai_data_loader:\u2705 Saved: C:\Users\Manvi\Documents\AI Resume Analyzer\fairxai_combined_processed.csv
+ERROR:__main__:\u274c Workflow execution failed: 'charmap' codec can't encode character '\u2705' in position 2: character maps to <undefined>
+Traceback (most recent call last):
+  File "C:\Users\Manvi\Documents\AI Resume Analyzer\run_fairxai_workflow.py", line 398, in <module>
+    run_complete_workflow()
+  File "C:\Users\Manvi\Documents\AI Resume Analyzer\run_fairxai_workflow.py", line 100, in run_complete_workflow
+    print("\n\u2705 PHASE 1 COMPLETE: Data loaded and processed")
+  File "C:\Users\Manvi\AppData\Local\Programs\Python\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 2: character maps to <undefined>
+
+====================================================================================================
+FAIR-XAI COMPLETE WORKFLOW EXECUTION
+====================================================================================================
+
+====================================================================================================
+PHASE 1: DATA LOADING & PREPARATION
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+Loading Kaggle Dataset (Real Data)
+----------------------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------------------
+Loading Synthetic Dataset (Controlled 600 Resumes)
+----------------------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------------------
+Merging Datasets
+----------------------------------------------------------------------------------------------------

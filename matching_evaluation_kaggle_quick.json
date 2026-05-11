@@ -1,0 +1,128 @@
+{
+  "dataset": "Kaggle (2,484 resumes)",
+  "sample_size": 150,
+  "jd_count": 10,
+  "total_comparisons": 1500,
+  "matching_results": [
+    {
+      "jd_index": 0,
+      "jd_preview": "Senior Python Backend Engineer - 5+ years Django/Flask development required. Bui",
+      "top_5_scores": [
+        0.20388128350001783,
+        0.18067738150202534,
+        0.17907904813012349,
+        0.17632734313800705,
+        0.15394888220236436
+      ]
+    },
+    {
+      "jd_index": 1,
+      "jd_preview": "React Frontend Developer needed. 3+ years React.js and Redux experience. Build b",
+      "top_5_scores": [
+        0.21963961094355738,
+        0.2001522729531174,
+        0.1913475326829938,
+        0.1813407817756172,
+        0.1599428482935486
+      ]
+    },
+    {
+      "jd_index": 2,
+      "jd_preview": "DevOps Engineer - Kubernetes and Docker essential. Terraform infrastructure-as-c",
+      "top_5_scores": [
+        0.3390048398545929,
+        0.32140775162305046,
+        0.2913092215662203,
+        0.2778348116628398,
+        0.27699740245478566
+      ]
+    },
+    {
+      "jd_index": 3,
+      "jd_preview": "Data Scientist - Python, SQL, statistics required. Machine learning libraries (s",
+      "top_5_scores": [
+        0.22108315630872813,
+        0.22011681757073026,
+        0.19288680437061553,
+        0.1919417608107427,
+        0.1824760545402323
+      ]
+    },
+    {
+      "jd_index": 4,
+      "jd_preview": "Senior Java Backend Engineer - Spring Boot microservices architecture expertise.",
+      "top_5_scores": [
+        0.2840123210392226,
+        0.28122713185230136,
+        0.26870947110990995,
+        0.2548307422558171,
+        0.2448611949033755
+      ]
+    },
+    {
+      "jd_index": 5,
+      "jd_preview": "Machine Learning Engineer - TensorFlow, PyTorch expertise required. NLP and Comp",
+      "top_5_scores": [
+        0.19467691533767054,
+        0.17229994714668972,
+        0.1622551653471201,
+        0.1406918483299383,
+        0.14005077145379488
+      ]
+    },
+    {
+      "jd_index": 6,
+      "jd_preview": "AWS Solutions Architect - Design scalable cloud infrastructure. 7+ years cloud a",
+      "top_5_scores": [
+        0.3148104201752961,
+        0.21050017783094527,
+        0.20666937365529126,
+        0.2052693993735737,
+        0.19569364005860584
+      ]
+    },
+    {
+      "jd_index": 7,
+      "jd_preview": "Full Stack JavaScript Engineer - 4+ years React/Vue.js frontend. Backend: Node.j",
+      "top_5_scores": [
+        0.304333284486748,
+        0.19093634678955757,
+        0.1686112820128387,
+        0.1385039567779415,
+        0.13335526946639076
+      ]
+    },
+    {
+      "jd_index": 8,
+      "jd_preview": "Mobile App Developer - React Native or Flutter experience. 3+ years shipping app",
+      "top_5_scores": [
+        0.1923041093859681,
+        0.16312863407671263,
+        0.1437673695932273,
+        0.1229630812856873,
+        0.12219436983723403
+      ]
+    },
+    {
+      "jd_index": 9,
+      "jd_preview": "Systems Administrator - Linux, Windows server administration required. Active Di",
+      "top_5_scores": [
+        0.302623650788643,
+        0.2588547968080757,
+        0.23342931041467385,
+        0.21234046923814698,
+        0.19534131326402163
+      ]
+    }
+  ],
+  "statistics": {
+    "mean": 0.04720707502057615,
+    "median": 0.035629242090441354,
+    "std": 0.04608359905993627,
+    "min": 0.0,
+    "max": 0.3390048398545929,
+    "q75": 0.06256073943327459,
+    "q95": 0.12752371055345307,
+    "avg_top5_per_jd": 0.2104128273995866
+  }
+}

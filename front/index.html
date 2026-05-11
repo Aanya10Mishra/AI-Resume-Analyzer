@@ -19,6 +19,9 @@
     <!-- AOS Animation Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     
+    <!-- Password Reset Script -->
+    <script src="password-reset.js"></script>
+    
     <!-- Custom Tailwind Config -->
     <script>
         tailwind.config = {
@@ -67,6 +70,14 @@
     </script>
     
     <style>
+        :root {
+            --ui-surface: #ffffff;
+            --ui-muted: #6b7280;
+            --ui-border: #e5e7eb;
+            --ui-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+            --ui-radius: 16px;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
         }
@@ -109,7 +120,44 @@
             transform: translateY(-3px);
             box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
         }
-        
+
+        .ui-card {
+            background: var(--ui-surface);
+            border: 1px solid var(--ui-border);
+            border-radius: var(--ui-radius);
+            box-shadow: var(--ui-shadow);
+        }
+
+        .ai-tool-card {
+            padding: 1.2rem;
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        }
+
+        .ai-tool-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 26px rgba(102, 126, 234, 0.10);
+            border-color: #d5dcff;
+        }
+
+        .workspace-toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 12;
+            background: rgba(255, 255, 255, 0.94);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #eef2ff;
+            border-radius: 12px;
+            padding: .65rem .75rem;
+            margin-bottom: .9rem;
+        }
+
+        .doc-canvas {
+            background: linear-gradient(180deg, #f9fafb 0%, #f3f4f6 100%);
+            border-radius: 14px;
+            padding: .9rem;
+        }
+
         .score-ring {
             background: conic-gradient(#10b981 var(--score), #e5e7eb var(--score));
         }
@@ -129,8 +177,19 @@
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
-            min-height: 200px;
+            min-height: auto !important;
+            max-height: none !important;
+            height: auto !important;
             overflow: visible !important;
+            width: 100% !important;
+        }
+        
+        /* AI Results parent container - allow scrolling */
+        #ai-results-container {
+            overflow: visible !important;
+            max-height: none !important;
+            height: auto !important;
+            min-height: auto !important;
         }
         
         /* Fix grid layout for large screens */
@@ -192,6 +251,48 @@
             }
         }
     </style>
+    <!-- app.js will be loaded at the end of body -->
+    
+    <!-- Wrapper functions to handle onclick before app.js loads -->
+    <script>
+    // Global wrappers that will delegate to real functions once loaded
+    function showSection(sectionId) {
+        if (typeof window._showSection === 'function') {
+            return window._showSection(sectionId);
+        }
+        console.warn('showSection not ready yet');
+    }
+    
+    function logout() {
+        if (typeof window._logout === 'function') {
+            return window._logout();
+        }
+        console.warn('logout not ready yet');
+    }
+    
+    function showDashboardTab(tabId) {
+        if (typeof window._showDashboardTab === 'function') {
+            return window._showDashboardTab(tabId);
+        }
+        console.warn('showDashboardTab not ready yet');
+    }
+    
+    function handleLogin() {
+        if (typeof window._handleLogin === 'function') {
+            return window._handleLogin();
+        }
+        console.warn('handleLogin not ready yet');
+    }
+    
+    function handleRegister() {
+        if (typeof window._handleRegister === 'function') {
+            return window._handleRegister();
+        }
+        console.warn('handleRegister not ready yet');
+    }
+    
+    console.log('✅ Wrapper functions initialized');
+    </script>
 </head>
 <body class="bg-gray-50 min-h-screen">
     
@@ -251,7 +352,7 @@
     <section id="landing" class="page-section active">
         
         <!-- API Status -->
-        <div id="api-status" class="fixed top-16 left-0 right-0 z-30 text-center py-2 text-sm font-medium transition-all duration-300">
+        <div id="api-status" class="fixed top-16 left-0 right-0 z-30 text-center py-2 text-sm font-medium transition-all duration-300 hidden">
             <span id="status-text">🔄 Checking backend connection...</span>
         </div>
         
@@ -287,10 +388,6 @@
                             <div class="text-center">
                                 <div class="text-3xl font-bold">98%</div>
                                 <div class="text-white/70 text-sm">Accuracy</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-3xl font-bold">10K+</div>
-                                <div class="text-white/70 text-sm">Resumes Analyzed</div>
                             </div>
                             <div class="text-center">
                                 <div class="text-3xl font-bold">5s</div>
@@ -629,6 +726,12 @@
                                placeholder="Enter your password">
                     </div>
                     
+                    <div class="text-right">
+                        <button type="button" onclick="showForgotPasswordModal()" class="text-primary-500 hover:text-primary-600 text-sm font-medium transition-colors">
+                            <i class="fas fa-key mr-1"></i>Forgot Password?
+                        </button>
+                    </div>
+                    
                     <button type="submit" class="w-full btn-primary text-white py-4 rounded-xl font-bold text-lg">
                         <i class="fas fa-sign-in-alt mr-2"></i>Login
                     </button>
@@ -729,8 +832,13 @@
                         </h1>
                         <p class="text-gray-500 mt-1">Manage your resumes and job applications</p>
                     </div>
-                    <div id="dashboard-role-badge" class="mt-4 md:mt-0 px-6 py-2 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 text-white font-bold capitalize">
-                        Role
+                    <div class="flex flex-wrap items-center gap-4 mt-4 md:mt-0">
+                        <button onclick="showChangePasswordModal()" class="px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors flex items-center gap-2">
+                            <i class="fas fa-lock"></i>Change Password
+                        </button>
+                        <div id="dashboard-role-badge" class="px-6 py-2 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 text-white font-bold capitalize">
+                            Role
+                        </div>
                     </div>
                 </div>
                 
@@ -911,11 +1019,12 @@
                 
                 <!-- ===== AI TAB ===== -->
                 <div id="content-ai" class="dashboard-content hidden">
-                    <div class="grid lg:grid-cols-2 gap-8">
+                    <div class="grid lg:grid-cols-12 gap-8 items-start">
                         <!-- AI Tools -->
-                        <div class="space-y-6">
+                        <div class="lg:col-span-4">
+                            <div class="lg:sticky lg:top-24 space-y-4 max-h-[calc(100vh-140px)] overflow-y-auto pr-1">
                             <!-- Resume Improvement -->
-                            <div class="bg-white rounded-2xl shadow-lg p-8" data-aos="fade-right">
+                            <div class="ui-card ai-tool-card" data-aos="fade-right">
                                 <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
                                         <i class="fas fa-magic text-white"></i>
@@ -934,20 +1043,45 @@
                             </div>
                             
                             <!-- Career Path -->
-                            <div class="bg-white rounded-2xl shadow-lg p-8" data-aos="fade-right" data-aos-delay="100">
+                            <div class="ui-card ai-tool-card" data-aos="fade-right" data-aos-delay="100">
                                 <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center">
                                         <i class="fas fa-route text-white"></i>
                                     </div>
                                     Career Path
                                 </h2>
-                                <button onclick="getCareerPath()" class="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white py-4 rounded-xl font-bold hover:opacity-90 transition-opacity">
-                                    <i class="fas fa-map-signs mr-2"></i>Explore Career Path
-                                </button>
+                                <div class="space-y-4">
+                                    <div class="form-group">
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                            <i class="fas fa-briefcase mr-1"></i>Select Career Field (Optional)
+                                        </label>
+                                        <select id="career-field-select" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none bg-white">
+                                            <option value="">-- Auto-detect from skills --</option>
+                                            <option value="Software Engineer">Software Engineer</option>
+                                            <option value="Data Scientist">Data Scientist</option>
+                                            <option value="Product Manager">Product Manager</option>
+                                            <option value="DevOps Engineer">DevOps Engineer</option>
+                                            <option value="Machine Learning Engineer">Machine Learning Engineer</option>
+                                            <option value="Systems Architect">Systems Architect</option>
+                                            <option value="Frontend Developer">Frontend Developer</option>
+                                            <option value="Backend Developer">Backend Developer</option>
+                                            <option value="Full Stack Developer">Full Stack Developer</option>
+                                            <option value="Cloud Architect">Cloud Architect</option>
+                                            <option value="Database Administrator">Database Administrator</option>
+                                            <option value="Security Engineer">Security Engineer</option>
+                                            <option value="UX/UI Designer">UX/UI Designer</option>
+                                            <option value="Business Analyst">Business Analyst</option>
+                                            <option value="Solutions Architect">Solutions Architect</option>
+                                        </select>
+                                    </div>
+                                    <button onclick="getCareerPath()" class="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white py-4 rounded-xl font-bold hover:opacity-90 transition-opacity">
+                                        <i class="fas fa-map-signs mr-2"></i>Explore Career Path
+                                    </button>
+                                </div>
                             </div>
                             
                             <!-- Interview Prep -->
-<div class="bg-white rounded-2xl shadow-lg p-8" data-aos="fade-right" data-aos-delay="200">
+<div class="ui-card ai-tool-card" data-aos="fade-right" data-aos-delay="200">
     <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center">
             <i class="fas fa-comments text-white"></i>
@@ -966,19 +1100,108 @@
     <i class="fas fa-user-tie mr-2"></i>Get Interview Prep
 </button>
 </div>
-                        
-                        <!-- AI Results -->
-                        <div class="results-container bg-white rounded-2xl shadow-lg p-8" data-aos="fade-left">
-                            <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
-                                    <i class="fas fa-sparkles text-white"></i>
+
+                            <!-- Cover Letter Generator -->
+                            <div class="ui-card ai-tool-card" data-aos="fade-right" data-aos-delay="250">
+                                <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                                        <i class="fas fa-envelope-open-text text-white"></i>
+                                    </div>
+                                    Cover Letter Generator
+                                </h2>
+                                <div class="space-y-4">
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <select id="coverletter-resume" class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none bg-white">
+                                            <option value="">-- Select Resume --</option>
+                                        </select>
+                                        <select id="coverletter-jd" class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none bg-white">
+                                            <option value="">-- Select Job --</option>
+                                        </select>
+                                    </div>
+                                    <select id="coverletter-tone" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none bg-white">
+                                        <option value="professional">Tone: Professional</option>
+                                        <option value="confident">Tone: Confident</option>
+                                        <option value="friendly">Tone: Friendly</option>
+                                        <option value="concise">Tone: Concise</option>
+                                    </select>
+                                    <button type="button" onclick="getCoverLetter(event); return false;" class="w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white py-4 rounded-xl font-bold hover:opacity-90 transition-opacity">
+                                        <i class="fas fa-file-signature mr-2"></i>Generate Cover Letter
+                                    </button>
                                 </div>
-                                AI Results
-                            </h2>
-                            
-                            <div id="ai-results" class="text-center py-10 text-gray-400">
-                                <i class="fas fa-robot text-6xl mb-4"></i>
-                                <p>Use the AI tools on the left to get results</p>
+                            </div>
+
+                            <!-- One-Click Tailored Resume -->
+                            <div class="ui-card ai-tool-card" data-aos="fade-right" data-aos-delay="300">
+                                <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center">
+                                        <i class="fas fa-wand-magic-sparkles text-white"></i>
+                                    </div>
+                                    One-Click Tailored Resume
+                                </h2>
+                                <div class="space-y-4">
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <select id="tailor-resume" class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none bg-white">
+                                            <option value="">-- Select Resume --</option>
+                                        </select>
+                                        <select id="tailor-jd" class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:outline-none bg-white">
+                                            <option value="">-- Select Job --</option>
+                                        </select>
+                                    </div>
+                                    <button type="button" onclick="getTailoredResume(event); return false;" class="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-4 rounded-xl font-bold hover:opacity-90 transition-opacity">
+                                        <i class="fas fa-bolt mr-2"></i>Generate Tailored Resume
+                                    </button>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        
+                        <!-- AI Workspace -->
+                        <div id="ai-results-container" class="lg:col-span-8 w-full ui-card p-5 md:p-6 min-h-[72vh] flex flex-col">
+                            <div class="workspace-toolbar">
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-sparkles text-white text-sm"></i>
+                                    </div>
+                                    <span id="ai-results-title">AI Results Workspace</span>
+                                </h2>
+
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <button id="ai-view-preview-btn" type="button" onclick="switchAIResultView('preview')" class="px-3 py-2 rounded-lg text-xs font-semibold bg-primary-500 text-white">Preview</button>
+                                    <button id="ai-view-raw-btn" type="button" onclick="switchAIResultView('raw')" class="px-3 py-2 rounded-lg text-xs font-semibold bg-gray-100 text-gray-700">Raw</button>
+                                    <button id="ai-copy-btn" type="button" onclick="copyAIResultText()" class="px-3 py-2 rounded-lg text-xs font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200">
+                                        <i class="fas fa-copy mr-1"></i>Copy
+                                    </button>
+                                    <button id="ai-download-btn" type="button" onclick="downloadAIResultText()" class="px-3 py-2 rounded-lg text-xs font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200">
+                                        <i class="fas fa-download mr-1"></i>Download
+                                    </button>
+                                </div>
+                            </div>
+                            </div>
+
+                            <div id="ai-inline-status" class="hidden mb-4 px-4 py-3 rounded-xl border border-primary-100 bg-primary-50">
+                                <div class="flex items-center justify-between gap-2 text-sm font-medium text-primary-700">
+                                    <span id="ai-inline-status-text">Working...</span>
+                                    <span id="ai-inline-status-percent" class="text-xs">0%</span>
+                                </div>
+                                <div class="mt-2 h-2 rounded-full bg-white/80 border border-primary-100 overflow-hidden">
+                                    <div id="ai-inline-status-bar" class="h-full bg-gradient-to-r from-primary-500 to-secondary-500 transition-all duration-400" style="width: 10%;"></div>
+                                </div>
+                            </div>
+
+                            <div id="ai-results-preview" class="flex-1">
+                                <div class="doc-canvas">
+                                <div id="ai-results" class="text-center py-8 text-gray-400 w-full">
+                                    <i class="fas fa-robot text-5xl mb-3"></i>
+                                    <p class="text-sm">Use the AI tools on the left to get results</p>
+                                </div>
+                                </div>
+                            </div>
+
+                            <div id="ai-results-raw" class="hidden flex-1">
+                                <div class="h-full bg-gray-900 rounded-xl p-4 overflow-auto">
+                                    <pre id="ai-results-raw-text" class="text-xs text-gray-100 whitespace-pre-wrap leading-relaxed"></pre>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -999,75 +1222,7 @@
     <!-- AOS Animation Library -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     
-    <!-- Main JavaScript -->
-    <script src="app.js"></script>
-    <!-- Navigation Protection -->
-<script>
-(function() {
-    console.log('🛡️ Installing navigation protection...');
-    
-    var analyzing = false;
-    
-    // Block navigation when analyzing
-    var blockNav = function(e) {
-        if (analyzing) {
-            e.preventDefault();
-            e.returnValue = '';
-            console.log('🚫 NAVIGATION BLOCKED during analysis');
-            return false;
-        }
-    };
-    
-    window.addEventListener('beforeunload', blockNav);
-    
-    // Wrap analyzeMatch
-    var originalAnalyze = window.analyzeMatch;
-    window.analyzeMatch = function(event) {
-        if (event) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        
-        analyzing = true;
-        console.log('🔒 Analysis lock ON');
-        
-        if (originalAnalyze) {
-            originalAnalyze.call(this, event);
-        }
-        
-        setTimeout(function() {
-            analyzing = false;
-            console.log('🔓 Analysis lock OFF');
-        }, 15000); // 15 seconds should be enough
-        
-        return false;
-    };
-    
-    // Wrap getInterviewPrep
-    var originalInterview = window.getInterviewPrep;
-    window.getInterviewPrep = function(event) {
-        if (event) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        
-        analyzing = true;
-        console.log('🔒 Interview prep lock ON');
-        
-        if (originalInterview) {
-            originalInterview.call(this, event);
-        }
-        
-        setTimeout(function() {
-            analyzing = false;
-            console.log('🔓 Interview prep lock OFF');
-        }, 15000);
-        
-        return false;
-    };
-    
-    console.log('✅ Navigation protection installed!');
-})();
-</script>
+<!-- Main Application Script -->
+<script src="app.js?v=20260510_7"></script>
 </body>
 </html>

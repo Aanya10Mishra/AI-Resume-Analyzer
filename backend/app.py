@@ -7,8 +7,10 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
+import threading
+import uuid
 
 from config import get_config
 from models.database import db, User, Resume, JobDescription, ResumeAnalysis
@@ -21,6 +23,9 @@ from routes.hr_routes import recruiter_bp, init_recruiter_routes
 
 # AI routes
 from routes.ai_routes import ai_bp, init_ai_routes
+
+# Authentication routes
+from routes.auth_routes import auth_bp
 
 # Setup logging
 logging.basicConfig(
@@ -50,6 +55,11 @@ def create_app(config_name="development"):
     resume_parser = ResumeParser()
     text_processor = TextProcessor(app.config["EMBEDDING_MODEL"])
     ats_scorer = ATSScorer()
+    
+    # In-memory async analysis job store
+    analysis_jobs = {}
+    analysis_jobs_lock = threading.Lock()
+    analysis_job_ttl = timedelta(minutes=30)
 
     # ==================== REGISTER ROLE-BASED ROUTES ====================
     
@@ -85,11 +95,185 @@ def create_app(config_name="development"):
     logger.info("   - Skill recommendations: /api/ai/skill-recommendations/<resume_id>")
     logger.info("   - Job optimization: /api/ai/optimize-for-job/<resume_id>/<jd_id>\n")
 
+    # ==================== REGISTER AUTHENTICATION ROUTES ====================
+    
+    logger.info("🔐 Registering authentication routes...")
+    
+    # Register authentication blueprint
+    app.register_blueprint(auth_bp)
+    
+    logger.info("✅ Authentication routes registered!")
+    logger.info("   - Signup: POST /api/auth/signup")
+    logger.info("   - Login: POST /api/auth/login")
+    logger.info("   - Forgot password: POST /api/auth/forgot-password")
+    logger.info("   - Reset password: POST /api/auth/reset-password")
+    logger.info("   - Change password: POST /api/auth/change-password/<user_id>")
+    logger.info("   - Get user: GET /api/auth/user/<user_id>")
+    logger.info("   - Update user: PUT /api/auth/user/<user_id>\n")
+
     logger.info("\n✅ All systems ready!\n")
 
     # Helper functions
     def allowed_file(filename):
         return "." in filename and filename.rsplit(".", 1)[1].lower() in app.config["ALLOWED_EXTENSIONS"]
+    
+    def prune_expired_analysis_jobs():
+        """Clean up stale analysis jobs from memory."""
+        cutoff = datetime.utcnow() - analysis_job_ttl
+        with analysis_jobs_lock:
+            stale_ids = [
+                job_id for job_id, job in analysis_jobs.items()
+                if datetime.fromisoformat(job["updated_at"]) < cutoff
+            ]
+            for job_id in stale_ids:
+                analysis_jobs.pop(job_id, None)
+    
+    def update_analysis_job(job_id, **updates):
+        """Thread-safe update for an async analysis job."""
+        with analysis_jobs_lock:
+            job = analysis_jobs.get(job_id)
+            if not job:
+                return
+            job.update(updates)
+            job["updated_at"] = datetime.utcnow().isoformat()
+    
+    def perform_analysis(resume_id: int, jd_id: int, progress_callback=None):
+        """
+        Shared analysis logic used by both sync and async endpoints.
+        Returns the same payload shape as the legacy sync endpoint.
+        """
+        if progress_callback:
+            progress_callback("Loading resume and job description...", 10)
+        
+        resume = Resume.query.get(resume_id)
+        jd = JobDescription.query.get(jd_id)
+
+        if not resume or not jd:
+            raise ValueError("Resume or JD not found")
+
+        logger.info(f"\n🔍 Analyzing: Resume {resume.id} vs JD {jd.id}")
+
+        if progress_callback:
+            progress_callback("Running semantic and skill matching...", 45)
+        
+        detailed_match = text_processor.calculate_detailed_match(
+            resume.raw_text,
+            jd.description
+        )
+
+        if progress_callback:
+            progress_callback("Computing ATS score and improvement suggestions...", 75)
+        
+        parsed_data = resume.get_parsed_data()
+        ats_result = ats_scorer.calculate_ats_score(parsed_data)
+        skill_analysis = detailed_match.get("skill_analysis", {})
+        
+        suggestions = text_processor.get_improvement_suggestions(
+            resume.raw_text,
+            jd.description,
+            detailed_match
+        )
+        recommendations = generate_recommendations(detailed_match)
+
+        if progress_callback:
+            progress_callback("Saving analysis result...", 90)
+        
+        analysis = ResumeAnalysis(
+            resume_id=resume.id,
+            jd_id=jd.id,
+            ats_score=ats_result["percentage"],
+            match_score=detailed_match["overall_match"],
+            semantic_score=detailed_match.get("semantic_similarity", detailed_match["overall_match"])
+        )
+        analysis.set_skill_gaps(skill_analysis.get("unmatched_jd_skills", []))
+        analysis.set_section_scores(detailed_match.get("section_scores", {}))
+
+        db.session.add(analysis)
+        db.session.commit()
+
+        logger.info(f"✅ Analysis complete! Match: {detailed_match['overall_match']}%\n")
+        
+        return {
+            "analysis_id": analysis.id,
+            
+            # Main scores
+            "match_score": detailed_match["overall_match"],
+            "ats_score": ats_result,
+            
+            # Detailed breakdown
+            "score_breakdown": {
+                "semantic_similarity": detailed_match.get("semantic_similarity", 0),
+                "skill_match": detailed_match.get("skill_match", 0),
+                "experience_match": detailed_match.get("experience_match", 0),
+                "keyword_match": detailed_match.get("keyword_match", 0)
+            },
+            
+            # Weights used
+            "scoring_weights": detailed_match.get("weights", {}),
+            
+            # Skills analysis
+            "matched_skills": skill_analysis.get("matched_skills", []),
+            "missing_skills": skill_analysis.get("unmatched_jd_skills", []),
+            "extra_skills": skill_analysis.get("extra_resume_skills", []),
+            
+            # Experience analysis
+            "experience_analysis": detailed_match.get("experience_analysis", {}),
+            
+            # Section scores
+            "section_scores": detailed_match.get("section_scores", {}),
+            
+            # Improvement suggestions
+            "suggestions": suggestions,
+            
+            # Recommendations
+            "recommendations": recommendations,
+            
+            # Legacy support (keep for backward compatibility)
+            "match_details": detailed_match,
+            "skill_analysis": skill_analysis
+        }
+    
+    def run_analysis_job(job_id: str, resume_id: int, jd_id: int):
+        """Background worker for async analysis endpoint."""
+        try:
+            update_analysis_job(
+                job_id,
+                status="running",
+                progress=15,
+                message="Analysis started..."
+            )
+            
+            with app.app_context():
+                result = perform_analysis(
+                    resume_id,
+                    jd_id,
+                    progress_callback=lambda message, progress: update_analysis_job(
+                        job_id,
+                        status="running",
+                        message=message,
+                        progress=progress
+                    )
+                )
+                
+                update_analysis_job(
+                    job_id,
+                    status="completed",
+                    progress=100,
+                    message="Analysis complete",
+                    completed_at=datetime.utcnow().isoformat(),
+                    result=result
+                )
+        except Exception as e:
+            with app.app_context():
+                db.session.rollback()
+            logger.error(f"❌ Async analysis error ({job_id}): {e}")
+            update_analysis_job(
+                job_id,
+                status="failed",
+                progress=100,
+                message="Analysis failed",
+                error=str(e)
+            )
 
     # ==================== HEALTH CHECK ====================
 
@@ -221,6 +405,11 @@ def create_app(config_name="development"):
 
             if not user_id:
                 return jsonify({"error": "User ID required"}), 400
+            
+            try:
+                user_id = int(user_id)
+            except (ValueError, TypeError):
+                return jsonify({"error": "Invalid user ID"}), 400
             if file.filename == "":
                 return jsonify({"error": "No file selected"}), 400
             if not allowed_file(file.filename):
@@ -235,6 +424,7 @@ def create_app(config_name="development"):
             file_size = os.path.getsize(file_path)
 
             logger.info(f"📄 Parsing resume: {filename} ({file_size} bytes)")
+            logger.info(f"   User ID: {user_id} (type: {type(user_id).__name__})")
 
             parsed_data = resume_parser.parse(file_path)
             ats_result = ats_scorer.calculate_ats_score(parsed_data)
@@ -426,104 +616,98 @@ def create_app(config_name="development"):
     def analyze_match():
         """Analyze resume vs JD with detailed scoring"""
         try:
-            data = request.get_json()
+            data = request.get_json(silent=True) or {}
 
             if not all(k in data for k in ["resume_id", "jd_id"]):
                 return jsonify({"error": "Missing resume_id or jd_id"}), 400
+            
+            try:
+                resume_id = int(data["resume_id"])
+                jd_id = int(data["jd_id"])
+            except (TypeError, ValueError):
+                return jsonify({"error": "resume_id and jd_id must be integers"}), 400
+            
+            result = perform_analysis(resume_id, jd_id)
+            return jsonify(result), 200
 
-            resume = Resume.query.get(data["resume_id"])
-            jd = JobDescription.query.get(data["jd_id"])
-
-            if not resume or not jd:
-                return jsonify({"error": "Resume or JD not found"}), 404
-
-            logger.info(f"\n🔍 Analyzing: Resume {resume.id} vs JD {jd.id}")
-
-            # Get detailed match analysis (now includes everything)
-            detailed_match = text_processor.calculate_detailed_match(
-                resume.raw_text,
-                jd.description
-            )
-
-            # Get ATS score
-            parsed_data = resume.get_parsed_data()
-            ats_result = ats_scorer.calculate_ats_score(parsed_data)
-
-            # Get skill analysis from detailed match
-            skill_analysis = detailed_match.get("skill_analysis", {})
-
-            # Get improvement suggestions
-            suggestions = text_processor.get_improvement_suggestions(
-                resume.raw_text,
-                jd.description,
-                detailed_match
-            )
-
-            # Generate recommendations
-            recommendations = generate_recommendations(detailed_match)
-
-            # Save analysis to database
-            analysis = ResumeAnalysis(
-                resume_id=resume.id,
-                jd_id=jd.id,
-                ats_score=ats_result["percentage"],
-                match_score=detailed_match["overall_match"],
-                semantic_score=detailed_match.get("semantic_similarity", detailed_match["overall_match"])
-            )
-            analysis.set_skill_gaps(skill_analysis.get("unmatched_jd_skills", []))
-            analysis.set_section_scores(detailed_match.get("section_scores", {}))
-
-            db.session.add(analysis)
-            db.session.commit()
-
-            logger.info(f"✅ Analysis complete! Match: {detailed_match['overall_match']}%\n")
-
-            return jsonify({
-                "analysis_id": analysis.id,
-                
-                # Main scores
-                "match_score": detailed_match["overall_match"],
-                "ats_score": ats_result,
-                
-                # Detailed breakdown
-                "score_breakdown": {
-                    "semantic_similarity": detailed_match.get("semantic_similarity", 0),
-                    "skill_match": detailed_match.get("skill_match", 0),
-                    "experience_match": detailed_match.get("experience_match", 0),
-                    "keyword_match": detailed_match.get("keyword_match", 0)
-                },
-                
-                # Weights used
-                "scoring_weights": detailed_match.get("weights", {}),
-                
-                # Skills analysis
-                "matched_skills": skill_analysis.get("matched_skills", []),
-                "missing_skills": skill_analysis.get("unmatched_jd_skills", []),
-                "extra_skills": skill_analysis.get("extra_resume_skills", []),
-                
-                # Experience analysis
-                "experience_analysis": detailed_match.get("experience_analysis", {}),
-                
-                # Section scores
-                "section_scores": detailed_match.get("section_scores", {}),
-                
-                # Improvement suggestions
-                "suggestions": suggestions,
-                
-                # Recommendations
-                "recommendations": recommendations,
-                
-                # Legacy support (keep for backward compatibility)
-                "match_details": detailed_match,
-                "skill_analysis": skill_analysis
-            }), 200
-
+        except ValueError as e:
+            if str(e) == "Resume or JD not found":
+                return jsonify({"error": str(e)}), 404
+            return jsonify({"error": str(e)}), 400
         except Exception as e:
             db.session.rollback()
             logger.error(f"❌ Analysis error: {e}")
             import traceback
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500
+    
+    @app.route("/api/analyze/match/async", methods=["POST"])
+    def analyze_match_async():
+        """Start async resume vs JD analysis and return job id immediately."""
+        try:
+            prune_expired_analysis_jobs()
+            data = request.get_json(silent=True) or {}
+
+            if not all(k in data for k in ["resume_id", "jd_id"]):
+                return jsonify({"error": "Missing resume_id or jd_id"}), 400
+            
+            try:
+                resume_id = int(data["resume_id"])
+                jd_id = int(data["jd_id"])
+            except (TypeError, ValueError):
+                return jsonify({"error": "resume_id and jd_id must be integers"}), 400
+            
+            if not Resume.query.get(resume_id) or not JobDescription.query.get(jd_id):
+                return jsonify({"error": "Resume or JD not found"}), 404
+            
+            job_id = uuid.uuid4().hex
+            now_iso = datetime.utcnow().isoformat()
+
+            with analysis_jobs_lock:
+                analysis_jobs[job_id] = {
+                    "job_id": job_id,
+                    "status": "queued",
+                    "progress": 5,
+                    "message": "Analysis queued",
+                    "resume_id": resume_id,
+                    "jd_id": jd_id,
+                    "created_at": now_iso,
+                    "updated_at": now_iso
+                }
+            
+            worker = threading.Thread(
+                target=run_analysis_job,
+                args=(job_id, resume_id, jd_id),
+                daemon=True
+            )
+            worker.start()
+            
+            return jsonify({
+                "job_id": job_id,
+                "status": "queued",
+                "message": "Analysis job started",
+                "poll_interval_ms": 1200
+            }), 202
+        except Exception as e:
+            logger.error(f"❌ Failed to start async analysis: {e}")
+            return jsonify({"error": str(e)}), 500
+    
+    @app.route("/api/analyze/match/status/<string:job_id>", methods=["GET"])
+    def analyze_match_status(job_id):
+        """Get status/progress (and final result) for an async analysis job."""
+        prune_expired_analysis_jobs()
+        
+        with analysis_jobs_lock:
+            job = analysis_jobs.get(job_id)
+            if not job:
+                return jsonify({"error": "Analysis job not found or expired"}), 404
+            payload = dict(job)
+        
+        # Only include heavy result payload when completed
+        if payload.get("status") != "completed":
+            payload.pop("result", None)
+        
+        return jsonify(payload), 200
 
     def generate_recommendations(match_data: dict) -> list:
         """Generate actionable recommendations based on match analysis"""

@@ -1,0 +1,390 @@
+{
+  "timestamp": "2026-04-10",
+  "methodology": "Kernel SHAP - Token Ablation",
+  "model": "Sentence Transformers (all-MiniLM-L6-v2)",
+  "total_pairs": 5,
+  "results": [
+    {
+      "pair_name": "Senior Python Developer (Strong Match)",
+      "baseline_similarity": 0.7766538858413696,
+      "total_tokens": 25,
+      "shap_analysis": {
+        "method": "Token Ablation (Kernel SHAP)",
+        "baseline": 0.7766538858413696,
+        "top_positive_tokens": [
+          {
+            "token": "microservices",
+            "shap_value": 0.034,
+            "direction": "positive"
+          },
+          {
+            "token": "deployment",
+            "shap_value": 0.0295,
+            "direction": "positive"
+          },
+          {
+            "token": "6",
+            "shap_value": 0.0266,
+            "direction": "positive"
+          },
+          {
+            "token": "in",
+            "shap_value": 0.025,
+            "direction": "positive"
+          },
+          {
+            "token": "engineers",
+            "shap_value": 0.0223,
+            "direction": "positive"
+          },
+          {
+            "token": "team",
+            "shap_value": 0.0141,
+            "direction": "positive"
+          },
+          {
+            "token": "years",
+            "shap_value": 0.0139,
+            "direction": "positive"
+          },
+          {
+            "token": "5",
+            "shap_value": 0.0086,
+            "direction": "positive"
+          }
+        ],
+        "top_negative_tokens": [
+          {
+            "token": "scaling",
+            "shap_value": 0.01,
+            "direction": "negative"
+          }
+        ],
+        "all_tokens_shap": {
+          "senior": 0.0,
+          "python": 0.0,
+          "developer": 0.0,
+          "with": 0.0062,
+          "6": 0.0266,
+          "years": 0.0139,
+          "experience": 0.0082,
+          "in": 0.025,
+          "django": 0.0,
+          "fastapi": 0.0,
+          "microservices": 0.034,
+          "led": 0.0,
+          "team": 0.0141,
+          "of": 0.0017,
+          "5": 0.0086,
+          "engineers": 0.0223,
+          "aws": 0.0,
+          "deployment": 0.0295,
+          "scaling": -0.01,
+          "expert": 0.0,
+          "rest": 0.0,
+          "apis": 0.0,
+          "postgresql": 0.0,
+          "redis": 0.0
+        }
+      },
+      "interpretation": "Strong match: Top skills align well with job requirements"
+    },
+    {
+      "pair_name": "Data Scientist (Moderate Match)",
+      "baseline_similarity": 0.5912771224975586,
+      "total_tokens": 20,
+      "shap_analysis": {
+        "method": "Token Ablation (Kernel SHAP)",
+        "baseline": 0.5912771224975586,
+        "top_positive_tokens": [
+          {
+            "token": "and",
+            "shap_value": 0.045,
+            "direction": "positive"
+          },
+          {
+            "token": "machine",
+            "shap_value": 0.0297,
+            "direction": "positive"
+          },
+          {
+            "token": "years",
+            "shap_value": 0.0266,
+            "direction": "positive"
+          },
+          {
+            "token": "degree",
+            "shap_value": 0.0157,
+            "direction": "positive"
+          },
+          {
+            "token": "learning",
+            "shap_value": 0.0156,
+            "direction": "positive"
+          }
+        ],
+        "top_negative_tokens": [
+          {
+            "token": "scikit-learn",
+            "shap_value": 0.0439,
+            "direction": "negative"
+          },
+          {
+            "token": "competitions",
+            "shap_value": 0.0088,
+            "direction": "negative"
+          },
+          {
+            "token": "analysis",
+            "shap_value": 0.0049,
+            "direction": "negative"
+          },
+          {
+            "token": "3",
+            "shap_value": 0.0043,
+            "direction": "negative"
+          },
+          {
+            "token": "visualization",
+            "shap_value": 0.0016,
+            "direction": "negative"
+          }
+        ],
+        "all_tokens_shap": {
+          "data": 0.0,
+          "scientist": 0.0,
+          "3": -0.0043,
+          "years": 0.0266,
+          "python": 0.0,
+          "sql": 0.0,
+          "machine": 0.0297,
+          "learning": 0.0156,
+          "tensorflow": 0.0,
+          "scikit-learn": -0.0439,
+          "statistical": 0.0,
+          "analysis": -0.0049,
+          "and": 0.045,
+          "visualization": -0.0016,
+          "kaggle": 0.0,
+          "competitions": -0.0088,
+          "undergraduate": 0.0,
+          "degree": 0.0157,
+          "computer": 0.0,
+          "science": 0.0
+        }
+      },
+      "interpretation": "Moderate match: Some relevant skills present, but gaps exist"
+    },
+    {
+      "pair_name": "Java Backend (Weak Match)",
+      "baseline_similarity": 0.190160870552063,
+      "total_tokens": 15,
+      "shap_analysis": {
+        "method": "Token Ablation (Kernel SHAP)",
+        "baseline": 0.190160870552063,
+        "top_positive_tokens": [
+          {
+            "token": "years",
+            "shap_value": 0.0337,
+            "direction": "positive"
+          },
+          {
+            "token": "design",
+            "shap_value": 0.0169,
+            "direction": "positive"
+          },
+          {
+            "token": "applications",
+            "shap_value": 0.0131,
+            "direction": "positive"
+          },
+          {
+            "token": "management",
+            "shap_value": 0.0053,
+            "direction": "positive"
+          },
+          {
+            "token": "microservices",
+            "shap_value": 0.003,
+            "direction": "positive"
+          },
+          {
+            "token": "4",
+            "shap_value": 0.0015,
+            "direction": "positive"
+          }
+        ],
+        "top_negative_tokens": [
+          {
+            "token": "patterns",
+            "shap_value": 0.0002,
+            "direction": "negative"
+          }
+        ],
+        "all_tokens_shap": {
+          "java": 0.0,
+          "developer": 0.0,
+          "4": 0.0015,
+          "years": 0.0337,
+          "spring": 0.0,
+          "boot": 0.0,
+          "microservices": 0.003,
+          "mysql": 0.0,
+          "enterprise": 0.0,
+          "applications": 0.0131,
+          "oop": 0.0,
+          "design": 0.0169,
+          "patterns": -0.0002,
+          "transaction": 0.0,
+          "management": 0.0053
+        }
+      },
+      "interpretation": "Weak match: Limited skill overlap with job requirements"
+    },
+    {
+      "pair_name": "React Developer (Good Match)",
+      "baseline_similarity": 0.7951885461807251,
+      "total_tokens": 20,
+      "shap_analysis": {
+        "method": "Token Ablation (Kernel SHAP)",
+        "baseline": 0.7951885461807251,
+        "top_positive_tokens": [
+          {
+            "token": "years",
+            "shap_value": 0.0293,
+            "direction": "positive"
+          },
+          {
+            "token": "testing",
+            "shap_value": 0.0246,
+            "direction": "positive"
+          },
+          {
+            "token": "management",
+            "shap_value": 0.0118,
+            "direction": "positive"
+          },
+          {
+            "token": "state",
+            "shap_value": 0.0095,
+            "direction": "positive"
+          },
+          {
+            "token": "experience",
+            "shap_value": 0.0073,
+            "direction": "positive"
+          },
+          {
+            "token": "backend",
+            "shap_value": 0.0065,
+            "direction": "positive"
+          },
+          {
+            "token": "4",
+            "shap_value": 0.0004,
+            "direction": "positive"
+          }
+        ],
+        "top_negative_tokens": [
+          {
+            "token": "mobile",
+            "shap_value": 0.0224,
+            "direction": "negative"
+          },
+          {
+            "token": "optimization",
+            "shap_value": 0.013,
+            "direction": "negative"
+          },
+          {
+            "token": "design",
+            "shap_value": 0.0024,
+            "direction": "negative"
+          }
+        ],
+        "all_tokens_shap": {
+          "frontend": 0.0,
+          "engineer": 0.0,
+          "4": 0.0004,
+          "years": 0.0293,
+          "react": 0.0,
+          "javascript": 0.0,
+          "html": 0.0,
+          "css": 0.0,
+          "redux": 0.0,
+          "state": 0.0095,
+          "management": 0.0118,
+          "jest": 0.0,
+          "testing": 0.0246,
+          "responsive": 0.0,
+          "design": -0.0024,
+          "mobile": -0.0224,
+          "optimization": -0.013,
+          "node.js": 0.0,
+          "backend": 0.0065,
+          "experience": 0.0073
+        }
+      },
+      "interpretation": "Strong match: Top skills align well with job requirements"
+    },
+    {
+      "pair_name": "Full Stack (Perfect Match)",
+      "baseline_similarity": 0.9209771752357483,
+      "total_tokens": 18,
+      "shap_analysis": {
+        "method": "Token Ablation (Kernel SHAP)",
+        "baseline": 0.9209771752357483,
+        "top_positive_tokens": [
+          {
+            "token": "5",
+            "shap_value": 0.0191,
+            "direction": "positive"
+          },
+          {
+            "token": "years",
+            "shap_value": 0.0145,
+            "direction": "positive"
+          },
+          {
+            "token": "microservices",
+            "shap_value": 0.0115,
+            "direction": "positive"
+          },
+          {
+            "token": "deployment",
+            "shap_value": 0.0031,
+            "direction": "positive"
+          }
+        ],
+        "top_negative_tokens": [
+          {
+            "token": "infrastructure",
+            "shap_value": 0.0048,
+            "direction": "negative"
+          }
+        ],
+        "all_tokens_shap": {
+          "full": 0.0,
+          "stack": 0.0,
+          "engineer": 0.0,
+          "5": 0.0191,
+          "years": 0.0145,
+          "javascript": 0.0,
+          "react": 0.0,
+          "node.js": 0.0,
+          "express": 0.0,
+          "mongodb": 0.0,
+          "rest": 0.0,
+          "apis": 0.0,
+          "microservices": 0.0115,
+          "docker": 0.0,
+          "deployment": 0.0031,
+          "aws": 0.0,
+          "infrastructure": -0.0048,
+          "devops": 0.0
+        }
+      },
+      "interpretation": "Strong match: Top skills align well with job requirements"
+    }
+  ]
+}

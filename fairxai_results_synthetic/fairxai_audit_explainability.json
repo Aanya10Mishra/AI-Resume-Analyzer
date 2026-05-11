@@ -1,0 +1,14 @@
+{
+  "method": "permutation",
+  "features": [
+    "years_experience"
+  ],
+  "importance": {
+    "features": [
+      "years_experience"
+    ],
+    "importance_scores": [
+      100.0
+    ]
+  }
+}
