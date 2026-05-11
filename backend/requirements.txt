@@ -6,7 +6,7 @@ werkzeug==3.0.3
 
 PyPDF2==3.0.1                  # unchanged (latest 3.0.x)
 python-docx==1.1.2
-spacy==3.7.5
+spacy==3.7.5 --only-binary :all:
 
 sentence-transformers==3.0.1
 torch==2.4.0                   # CPU wheel; use +cu121/+cu124 for CUDA
