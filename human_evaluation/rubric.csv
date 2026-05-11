@@ -1,6 +1,0 @@
-score,meaning,skill_alignment,experience_relevance,overall_match
-1,Very poor match,Skills are mostly unrelated to the role.,Prior work is not relevant to the job.,Resume should not be shortlisted.
-2,Weak match,"Some overlap, but major required skills are missing.",Limited relevant experience.,Unlikely fit without major training.
-3,Moderate match,Several relevant skills are present.,Partially relevant experience.,"Possible fit, but not a strong one."
-4,Strong match,Most required skills are present.,Clearly relevant experience.,Good candidate for shortlist.
-5,Excellent match,Skills align very closely with the role.,Highly relevant experience.,Excellent candidate for shortlist.
